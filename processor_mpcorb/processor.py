@@ -370,8 +370,10 @@ class AsteroidProcessor:
         df_orb['IsOneOppositionEarlier'] = chunk['is_opp_earlier']
         df_orb['uncertainty'] = chunk.get('uncertainty', "")
         df_orb['Reference'] = chunk.get('reference', "")
-        df_orb['Num_Obs'] = chunk.get('num_observations', "")
-        df_orb['Num_Opp'] = chunk.get('num_oppositions', "")
+        num_obs = pd.to_numeric(chunk.get('num_observations', ""))
+        df_orb['Num_Obs'] = np.where(num_obs.notna(), num_obs.astype(int).astype(str), "")
+        num_opp = pd.to_numeric(chunk.get('num_oppositions', ""))
+        df_orb['Num_Opp'] = np.where(num_opp.notna(), num_opp.astype(int).astype(str), "")
         df_orb['Coarse_Perts'] = chunk.get('coarse_perturbers', "")
         df_orb['Precise_Perts'] = chunk.get('precise_perturbers', "")
 

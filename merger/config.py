@@ -16,7 +16,8 @@ FILES = {
     'orbits': 'orbits.csv',
     'observations': 'observations.csv',
     'software': 'software.csv',
-    'astronomers': 'astronomers.csv'
+    'astronomers': 'astronomers.csv',
+    'classes': 'classes.csv'
 }
 
 # --- Mapping Inputs to Target Names ---
@@ -25,13 +26,15 @@ INPUT_MAP_MPC = {
     'orbits': 'mpcorb_orbits.csv',
     'observations': 'mpcorb_observations.csv',
     'software': 'mpcorb_software.csv',
-    'astronomers': 'mpcorb_astronomers.csv'
+    'astronomers': 'mpcorb_astronomers.csv',
+    'classes': 'mpcorb_classes.csv'
 }
 
 INPUT_MAP_NEO = {
     'asteroids': 'neo_asteroids.csv',
     'orbits': 'neo_orbits.csv',
-    'observations': 'neo_observations.csv'
+    'observations': 'neo_observations.csv',
+    'classes': 'neo_classes.csv'
 }
 
 # --- Data Types for Fast Loading ---
