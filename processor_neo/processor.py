@@ -246,7 +246,6 @@ class AsteroidProcessor:
             df_orb[target] = chunk[source].fillna("")
 
         df_orb['Hex_Flags'] = ""
-        df_orb['OrbitType'] = chunk['class_clean']
 
         # Empty fields not in NEO dataset
         df_orb['Is1kmNEO'] = ""

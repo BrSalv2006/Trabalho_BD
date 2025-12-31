@@ -365,7 +365,6 @@ class AsteroidProcessor:
             df_orb[col] = ""
 
         df_orb['Hex_Flags'] = chunk['hex_flags']
-        df_orb['OrbitType'] = chunk['OrbitType']
         df_orb['Is1kmNEO'] = chunk['is_1km_neo']
         df_orb['IsCriticalList'] = chunk['is_critical']
         df_orb['IsOneOppositionEarlier'] = chunk['is_opp_earlier']
