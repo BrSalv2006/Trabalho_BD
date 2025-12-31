@@ -97,10 +97,10 @@ class AsteroidProcessor:
         chunk['id_class'] = ""
 
         # 1. Update Maps
-        classes = chunk['class_clean'].dropna().unique()
+        classes = chunk['class_clean'].unique()
 
         for name in classes:
-            name_str = str(name).strip()
+            name_str = str(name)
             if not name_str:
                 continue
 
@@ -109,7 +109,7 @@ class AsteroidProcessor:
                 self.next_class_id += 1
 
         # 2. Vectorized Assignment
-        class_series = chunk['class_clean'].astype(str).str.strip().map(self.class_map)
+        class_series = chunk['class_clean'].map(self.class_map)
         mask_class = class_series.notna()
         chunk.loc[mask_class, 'id_class'] = class_series[mask_class].astype(int).astype(str)
 

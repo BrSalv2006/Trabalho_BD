@@ -193,7 +193,7 @@ class AsteroidProcessor:
         classes = chunk['OrbitType'].dropna().unique()
 
         for name in classes:
-            name_str = str(name).strip()
+            name_str = str(name)
             if not name_str:
                 continue
 
@@ -202,7 +202,7 @@ class AsteroidProcessor:
                 self.next_class_id += 1
 
         # 2. Vectorized Assignment
-        class_series = chunk['OrbitType'].astype(str).str.strip().map(self.class_map)
+        class_series = chunk['OrbitType'].map(self.class_map)
         mask_class = class_series.notna()
         chunk.loc[mask_class, 'id_class'] = class_series[mask_class].astype(int).astype(str)
 
@@ -377,5 +377,8 @@ class AsteroidProcessor:
 
         # Link to Class Table
         df_orb['IDClasse'] = chunk['id_class']
+
+        # Enforce Correct Column Order from Schema
+        df_orb = df_orb[SCHEMAS['mpcorb_orbits.csv']]
 
         df_orb.to_csv(self.file_handles['mpcorb_orbits.csv'], mode='a', header=False, index=False)
