@@ -45,6 +45,7 @@ MPCORB_DTYPES = {
 # --- MPCORB Parsing Constants ---
 
 # Heuristic constants to differentiate Software from Astronomers in the 'computer' column
+# Logic: If name starts with "MPC" or is "orbfit", it is Software.
 SOFTWARE_PREFIXES = ('MPC',)
 SOFTWARE_SPECIFIC_NAMES = {'orbfit'}
 
@@ -103,8 +104,5 @@ SCHEMAS = {
     ],
     'mpcorb_software.csv': [
         'IDSoftware', 'Nome', 'Versao'
-    ],
-    'mpcorb_classes.csv': [
-        'IDClasse', 'Descricao', 'CodClasse'
     ]
 }
