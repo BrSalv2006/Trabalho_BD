@@ -85,5 +85,8 @@ SCHEMAS = {
         'Hex_Flags', 'OrbitType', 'Is1kmNEO', 'IsCriticalList',
         'IsOneOppositionEarlier', 'uncertainty', 'Reference', 'Num_Obs',
         'Num_Opp', 'Coarse_Perts', 'Precise_Perts', 'IDClasse'
+    ],
+    'neo_classes.csv': [
+        'IDClasse', 'Descricao', 'CodClasse'
     ]
 }

@@ -55,7 +55,7 @@ def process_chunk_worker(chunk: pd.DataFrame) -> pd.DataFrame:
     ]
     flags_int = np.array(hex_list, dtype=np.int32)
 
-    chunk['OrbitType'] = pd.Series(flags_int & MASK_ORBIT_TYPE).map(ORBIT_TYPES).fillna("Unclassified")
+    chunk['OrbitType'] = pd.Series(flags_int & MASK_ORBIT_TYPE).map(ORBIT_TYPES).values
 
     chunk['is_neo_flag'] = ((flags_int & MASK_NEO) != 0).astype(int)
     chunk['is_pha_flag'] = ((flags_int & MASK_PHA) != 0).astype(int)
@@ -135,6 +135,10 @@ class AsteroidProcessor:
         self.astronomer_map: Dict[str, int] = {}
         self.next_astronomer_id = 1
 
+        # Class Map
+        self.class_map: Dict[str, int] = {}
+        self.next_class_id = 1
+
         self.next_asteroid_id = 1
         self.file_handles = {}
 
@@ -179,6 +183,29 @@ class AsteroidProcessor:
         mask_astro = astro_map_series.notna()
         chunk.loc[mask_astro, 'id_astro'] = astro_map_series[mask_astro].astype(int).astype(str)
 
+    def _map_classes(self, chunk: pd.DataFrame) -> None:
+        """
+        Maps OrbitType to Class IDs.
+        """
+        chunk['id_class'] = ""
+
+        # 1. Update Maps
+        classes = chunk['OrbitType'].dropna().unique()
+
+        for name in classes:
+            name_str = str(name).strip()
+            if not name_str:
+                continue
+
+            if name_str not in self.class_map:
+                self.class_map[name_str] = self.next_class_id
+                self.next_class_id += 1
+
+        # 2. Vectorized Assignment
+        class_series = chunk['OrbitType'].astype(str).str.strip().map(self.class_map)
+        mask_class = class_series.notna()
+        chunk.loc[mask_class, 'id_class'] = class_series[mask_class].astype(int).astype(str)
+
     def process(self):
         print(f"Reading {self.input_path}...")
 
@@ -222,8 +249,9 @@ class AsteroidProcessor:
                             chunk['IDAsteroide'] = range(self.next_asteroid_id, self.next_asteroid_id + chunk_len)
                             self.next_asteroid_id += chunk_len
 
-                            # --- Differentiate Software vs Astronomer ---
+                            # --- Maps ---
                             self._map_computers_and_astronomers(chunk)
+                            self._map_classes(chunk)
 
                             self._write_tables(chunk)
 
@@ -260,6 +288,15 @@ class AsteroidProcessor:
                 df_astro['IDCentro'] = ""
                 df_astro[['IDAstronomo', 'Nome', 'IDCentro']].to_csv(
                     self.file_handles['mpcorb_astronomers.csv'],
+                    mode='a', header=False, index=False
+                )
+
+            # 3. Classes
+            if self.class_map and 'mpcorb_classes.csv' in self.file_handles:
+                df_class = pd.DataFrame(list(self.class_map.items()), columns=['Descricao', 'IDClasse'])
+                df_class['CodClasse'] = df_class['Descricao'] # Map Descricao to CodClasse as fallback
+                df_class[['IDClasse', 'Descricao', 'CodClasse']].to_csv(
+                    self.file_handles['mpcorb_classes.csv'],
                     mode='a', header=False, index=False
                 )
 
@@ -338,5 +375,8 @@ class AsteroidProcessor:
         df_orb['Num_Opp'] = chunk.get('num_oppositions', "")
         df_orb['Coarse_Perts'] = chunk.get('coarse_perturbers', "")
         df_orb['Precise_Perts'] = chunk.get('precise_perturbers', "")
-        df_orb['IDClasse'] = ""
+
+        # Link to Class Table
+        df_orb['IDClasse'] = chunk['id_class']
+
         df_orb.to_csv(self.file_handles['mpcorb_orbits.csv'], mode='a', header=False, index=False)

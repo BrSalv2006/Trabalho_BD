@@ -3,6 +3,7 @@ import time
 import pandas as pd
 import numpy as np
 from concurrent.futures import ProcessPoolExecutor
+from typing import Dict
 
 from config import SCHEMAS, INPUT_FILE, CHUNK_SIZE, NEO_DTYPES
 from utils import ensure_directory
@@ -82,7 +83,35 @@ class AsteroidProcessor:
         self.input_path = input_path
         self.output_dir = output_dir
         self.next_asteroid_id = 1
+
+        # Class Map
+        self.class_map: Dict[str, int] = {}
+        self.next_class_id = 1
+
         self.file_handles = {}
+
+    def _map_classes(self, chunk: pd.DataFrame) -> None:
+        """
+        Maps Class string to Class IDs.
+        """
+        chunk['id_class'] = ""
+
+        # 1. Update Maps
+        classes = chunk['class_clean'].dropna().unique()
+
+        for name in classes:
+            name_str = str(name).strip()
+            if not name_str:
+                continue
+
+            if name_str not in self.class_map:
+                self.class_map[name_str] = self.next_class_id
+                self.next_class_id += 1
+
+        # 2. Vectorized Assignment
+        class_series = chunk['class_clean'].astype(str).str.strip().map(self.class_map)
+        mask_class = class_series.notna()
+        chunk.loc[mask_class, 'id_class'] = class_series[mask_class].astype(int).astype(str)
 
     def process(self):
         print(f"Reading {self.input_path}...")
@@ -126,6 +155,9 @@ class AsteroidProcessor:
                             chunk['IDAsteroide'] = range(self.next_asteroid_id, self.next_asteroid_id + chunk_len)
                             self.next_asteroid_id += chunk_len
 
+                            # Maps
+                            self._map_classes(chunk)
+
                             # Write to disk
                             self._write_tables(chunk)
 
@@ -146,6 +178,15 @@ class AsteroidProcessor:
                     # Process remaining
                     for future in futures:
                         handle_result(future)
+
+            # Write Classes Table
+            if self.class_map and 'neo_classes.csv' in self.file_handles:
+                df_class = pd.DataFrame(list(self.class_map.items()), columns=['Descricao', 'IDClasse'])
+                df_class['CodClasse'] = df_class['Descricao']
+                df_class[['IDClasse', 'Descricao', 'CodClasse']].to_csv(
+                    self.file_handles['neo_classes.csv'],
+                    mode='a', header=False, index=False
+                )
 
             end_time = time.time()
             print(f"\nDone! Processed {total_records} records in {end_time - start_time:.2f} seconds.")
@@ -217,7 +258,9 @@ class AsteroidProcessor:
         df_orb['Num_Opp'] = ""
         df_orb['Coarse_Perts'] = ""
         df_orb['Precise_Perts'] = ""
-        df_orb['IDClasse'] = ""
+
+        # Link to Class Table
+        df_orb['IDClasse'] = chunk['id_class']
 
         df_orb.to_csv(self.file_handles['neo_orbits.csv'], mode='a', header=False, index=False)
 

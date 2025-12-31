@@ -104,5 +104,8 @@ SCHEMAS = {
     ],
     'mpcorb_software.csv': [
         'IDSoftware', 'Nome', 'Versao'
+    ],
+    'mpcorb_classes.csv': [
+        'IDClasse', 'Descricao', 'CodClasse'
     ]
 }
