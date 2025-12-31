@@ -60,7 +60,10 @@ def process_chunk_worker(chunk: pd.DataFrame) -> pd.DataFrame:
     chunk['pdes_clean'] = chunk['pdes'].fillna("").astype(str).str.strip()
     chunk['prefix_clean'] = chunk['prefix'].fillna("").astype(str).str.strip()
     chunk['spkid_clean'] = chunk['spkid'].fillna("").astype(str).str.strip()
-    chunk['class_clean'] = chunk['class'].fillna("Unclassified").astype(str).str.strip()
+    chunk['class_clean'] = chunk['class'].astype(str).str.strip()
+    chunk.loc[chunk['class_clean'].isin(['nan', '', '<NA>']), 'class_clean'] = np.nan
+    chunk['class_desc_clean'] = chunk['class_description'].astype(str).str.strip()
+    chunk.loc[chunk['class_desc_clean'].isin(['nan', '', '<NA>']), 'class_desc_clean'] = np.nan
 
     # 5. Number Parsing
     id_str = chunk['id'].astype(str)
@@ -83,29 +86,31 @@ class AsteroidProcessor:
         self.input_path = input_path
         self.output_dir = output_dir
         self.next_asteroid_id = 1
-
-        # Class Map
         self.class_map: Dict[str, int] = {}
+        self.class_desc_map: Dict[str, str] = {}
         self.next_class_id = 1
-
         self.file_handles = {}
 
     def _map_classes(self, chunk: pd.DataFrame) -> None:
         """
-        Maps Class string to Class IDs.
+        Maps Class string to Class IDs and captures descriptions.
         """
         chunk['id_class'] = ""
 
         # 1. Update Maps
-        classes = chunk['class_clean'].unique()
+        unique_pairs = chunk[['class_clean', 'class_desc_clean']].drop_duplicates('class_clean')
 
-        for name in classes:
-            name_str = str(name)
-            if not name_str:
+        for _, row in unique_pairs.iterrows():
+            code = row['class_clean']
+            desc = row['class_desc_clean']
+
+            if pd.isna(code):
                 continue
 
-            if name_str not in self.class_map:
-                self.class_map[name_str] = self.next_class_id
+            if code not in self.class_map:
+                self.class_map[code] = self.next_class_id
+                final_desc = desc if not pd.isna(desc) else code
+                self.class_desc_map[code] = final_desc
                 self.next_class_id += 1
 
         # 2. Vectorized Assignment
@@ -181,8 +186,16 @@ class AsteroidProcessor:
 
             # Write Classes Table
             if self.class_map and 'neo_classes.csv' in self.file_handles:
-                df_class = pd.DataFrame(list(self.class_map.items()), columns=['Descricao', 'IDClasse'])
-                df_class['CodClasse'] = df_class['Descricao']
+                class_data = []
+                for code, id_val in self.class_map.items():
+                    desc = self.class_desc_map.get(code, code)
+                    class_data.append({
+                        'IDClasse': id_val,
+                        'Descricao': desc,
+                        'CodClasse': code
+                    })
+
+                df_class = pd.DataFrame(class_data)
                 df_class[['IDClasse', 'Descricao', 'CodClasse']].to_csv(
                     self.file_handles['neo_classes.csv'],
                     mode='a', header=False, index=False
