@@ -262,6 +262,9 @@ class AsteroidProcessor:
         # Link to Class Table
         df_orb['IDClasse'] = chunk['id_class']
 
+        # Enforce Correct Column Order from Schema (Fixes tp vs rms issue)
+        df_orb = df_orb[SCHEMAS['neo_orbits.csv']]
+
         df_orb.to_csv(self.file_handles['neo_orbits.csv'], mode='a', header=False, index=False)
 
         # neo_observations.csv
