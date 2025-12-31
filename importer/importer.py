@@ -1,160 +1,96 @@
 import os
+import time
 import pandas as pd
-import numpy as np
-from config import DIR_MPC, DIR_NEO, OUTPUT_DIR, FILES, INPUT_MAP_MPC, INPUT_MAP_NEO
+from sqlalchemy import create_engine, text
+from config import (
+    DB_CONNECTION_STRING, INPUT_DIR, BATCH_SIZE,
+    TABLE_MAPPINGS, IMPORT_ORDER, IDENTITY_TABLES, STRING_LIMITS
+)
 
-class DataMerger:
+class DBImporter:
     def __init__(self):
-        # We store ID maps as Pandas Series for vectorized lookups
-        self.mpc_id_map = None
-        self.neo_id_map = None
+        print(f"Initializing Database connection...")
+        # fast_executemany=True is highly recommended for MSSQL+pyodbc performance
+        self.engine = create_engine(DB_CONNECTION_STRING, fast_executemany=True)
 
-    def _create_match_key(self, df):
-        """
-        Creates a single normalized column for matching duplicates using vectorization.
-        Priority: Number > Pdes (Provisional Desig) > Name
-        """
-        # Vectorized String Cleaning
-        number = df['number'].fillna("").astype(str).str.strip().str.lstrip('0')
-        pdes = df['pdes'].fillna("").astype(str).str.strip().str.upper()
-        name = df['name'].fillna("").astype(str).str.strip().str.upper()
+    def import_file(self, filename, table_name):
+        filepath = os.path.join(INPUT_DIR, filename)
 
-        # Boolean masks for vectorized selection
-        has_number = number != ""
-        has_pdes = pdes != ""
+        if not os.path.exists(filepath):
+            print(f"Skipping {filename}: File not found in {INPUT_DIR}.")
+            return
 
-        # numpy.select evaluates conditions in order on the whole array
-        conditions = [has_number, has_pdes]
-        choices = ["NUM_" + number, "DES_" + pdes]
-        default = "NAM_" + name
+        print(f"\n--- Importing {filename} -> {table_name} ---")
 
-        return np.select(conditions, choices, default=default)
+        start_time = time.time()
+        total_rows = 0
 
-    def merge_asteroids(self):
-        print("Merging Asteroids tables...")
+        # We read as string (dtype=str) to preserve formatting (e.g. "001" vs "1")
+        chunk_iterator = pd.read_csv(
+            filepath,
+            chunksize=BATCH_SIZE,
+            dtype=str,
+            keep_default_na=False
+        )
 
-        path_mpc = os.path.join(DIR_MPC, INPUT_MAP_MPC['asteroids'])
-        path_neo = os.path.join(DIR_NEO, INPUT_MAP_NEO['asteroids'])
+        try:
+            # Use a single connection for the file to manage IDENTITY_INSERT
+            with self.engine.connect() as conn:
 
-        if not os.path.exists(path_mpc):
-            raise FileNotFoundError(f"Missing {path_mpc}")
+                # Check if we need to enable IDENTITY_INSERT
+                is_identity_table = table_name in IDENTITY_TABLES
 
-        # low_memory=False speeds up reading by using larger blocks
-        df_mpc = pd.read_csv(path_mpc, dtype=str, low_memory=False)
+                for chunk in chunk_iterator:
+                    if chunk.empty:
+                        continue
 
-        if os.path.exists(path_neo):
-            df_neo = pd.read_csv(path_neo, dtype=str, low_memory=False)
-        else:
-            df_neo = pd.DataFrame(columns=df_mpc.columns)
+                    # 1. Clean Data: Convert empty strings "" to None (SQL NULL)
+                    chunk = chunk.replace({"": None, "nan": None})
 
-        # Vectorized Key Generation
-        df_mpc['match_key'] = self._create_match_key(df_mpc)
-        df_neo['match_key'] = self._create_match_key(df_neo)
+                    # 2. Enforce String Limits (Truncation)
+                    if table_name in STRING_LIMITS:
+                        for col, limit in STRING_LIMITS[table_name].items():
+                            if col in chunk.columns:
+                                # Slice strings to the limit
+                                chunk[col] = chunk[col].astype(str).str.slice(0, limit)
+                                # Restore None for "None" strings resulting from astype conversion of nulls
+                                chunk.loc[chunk[col] == 'None', col] = None
 
-        # Vectorized Filtering
-        df_mpc = df_mpc[df_mpc['match_key'] != "NAM_"]
-        df_neo = df_neo[df_neo['match_key'] != "NAM_"]
+                    # 3. Insert to Database using Transaction
+                    # We wrap the insert in a transaction to handle IDENTITY_INSERT safely
+                    with conn.begin():
+                        if is_identity_table:
+                            conn.execute(text(f"SET IDENTITY_INSERT [{table_name}] ON"))
 
-        # Set Index for fast alignment in combine_first (C-level optimization)
-        df_mpc = df_mpc.set_index('match_key')
-        df_neo = df_neo.set_index('match_key')
+                        chunk.to_sql(
+                            table_name,
+                            conn,
+                            if_exists='append',
+                            index=False,
+                            method=None,
+                            chunksize=BATCH_SIZE
+                        )
 
-        print(f"MPC Unique Records: {len(df_mpc)}")
-        print(f"NEO Unique Records: {len(df_neo)}")
+                        if is_identity_table:
+                            conn.execute(text(f"SET IDENTITY_INSERT [{table_name}] OFF"))
 
-        # combine_first aligns indices and fills gaps without looping
-        df_merged = df_mpc.combine_first(df_neo)
+                    total_rows += len(chunk)
+                    print(f"Inserted {total_rows} rows...", end='\r')
 
-        df_merged = df_merged.reset_index()
+        except Exception as e:
+            print(f"\n[ERROR] Failed to import {filename}: {e}")
+            return
 
-        # Vectorized Sequential ID Generation
-        df_merged['New_IDAsteroide'] = np.arange(1, len(df_merged) + 1).astype(str)
-
-        # --- Build ID Maps (Optimized) ---
-        # Create a reference Series: match_key -> New_ID
-        key_to_new_id = df_merged.set_index('match_key')['New_IDAsteroide']
-
-        print("Building ID maps...")
-        # Map back to MPC Old IDs using vectorized index lookup
-        mpc_keys = df_mpc.reset_index()[['IDAsteroide', 'match_key']]
-        mpc_keys['New_ID'] = mpc_keys['match_key'].map(key_to_new_id)
-        # Store as Series (Index=Old_ID, Value=New_ID) for fast .map() later
-        self.mpc_id_map = mpc_keys.set_index('IDAsteroide')['New_ID']
-
-        # Map back to NEO Old IDs
-        neo_keys = df_neo.reset_index()[['IDAsteroide', 'match_key']]
-        neo_keys['New_ID'] = neo_keys['match_key'].map(key_to_new_id)
-        self.neo_id_map = neo_keys.set_index('IDAsteroide')['New_ID']
-
-        # Finalize
-        df_merged['IDAsteroide'] = df_merged['New_IDAsteroide']
-        df_merged.drop(columns=['match_key', 'New_IDAsteroide'], inplace=True)
-
-        self._save(df_merged, FILES['asteroids'])
-        print(f"Merged Asteroids saved. Total count: {len(df_merged)}")
-
-    def _update_ids(self, df, id_map_series):
-        """
-        Updates 'IDAsteroide' using vectorized mapping.
-        """
-        if df.empty: return df
-        # map() with a Series uses optimized index lookup
-        df['IDAsteroide'] = df['IDAsteroide'].map(id_map_series)
-        return df.dropna(subset=['IDAsteroide'])
-
-    def merge_orbits(self):
-        print("Merging Orbits tables...")
-
-        path_mpc = os.path.join(DIR_MPC, INPUT_MAP_MPC['orbits'])
-        df_mpc = pd.read_csv(path_mpc, dtype=str, low_memory=False)
-        # Vectorized Update
-        df_mpc = self._update_ids(df_mpc, self.mpc_id_map)
-
-        path_neo = os.path.join(DIR_NEO, INPUT_MAP_NEO['orbits'])
-        if os.path.exists(path_neo):
-            df_neo = pd.read_csv(path_neo, dtype=str, low_memory=False)
-            df_neo = self._update_ids(df_neo, self.neo_id_map)
-        else:
-            df_neo = pd.DataFrame()
-
-        # Concatenate (Vectorized Append)
-        df_merged = pd.concat([df_mpc, df_neo], ignore_index=True)
-        self._save(df_merged, FILES['orbits'])
-
-    def merge_observations(self):
-        print("Merging Observations tables...")
-
-        path_mpc = os.path.join(DIR_MPC, INPUT_MAP_MPC['observations'])
-        df_mpc = pd.read_csv(path_mpc, dtype=str, low_memory=False)
-        df_mpc = self._update_ids(df_mpc, self.mpc_id_map)
-
-        path_neo = os.path.join(DIR_NEO, INPUT_MAP_NEO['observations'])
-        if os.path.exists(path_neo):
-            df_neo = pd.read_csv(path_neo, dtype=str, low_memory=False)
-            df_neo = self._update_ids(df_neo, self.neo_id_map)
-        else:
-            df_neo = pd.DataFrame()
-
-        df_merged = pd.concat([df_mpc, df_neo], ignore_index=True)
-        self._save(df_merged, FILES['observations'])
-
-    def copy_references(self):
-        print("Copying Reference tables...")
-        for key in ['software', 'astronomers']:
-            src = os.path.join(DIR_MPC, INPUT_MAP_MPC[key])
-            if os.path.exists(src):
-                df = pd.read_csv(src, dtype=str, low_memory=False)
-                self._save(df, FILES[key])
-
-    def _save(self, df, filename):
-        path = os.path.join(OUTPUT_DIR, filename)
-        if not os.path.exists(OUTPUT_DIR):
-            os.makedirs(OUTPUT_DIR)
-        df.to_csv(path, index=False)
+        duration = time.time() - start_time
+        print(f"\nCompleted {table_name}: {total_rows} rows in {duration:.2f} seconds.")
 
     def run(self):
-        self.merge_asteroids()
-        self.merge_orbits()
-        self.merge_observations()
-        self.copy_references()
-        print("Merge Pipeline Complete!")
+        # Iterate through the defined order to respect Foreign Keys
+        for filename in IMPORT_ORDER:
+            if filename in TABLE_MAPPINGS:
+                table_name = TABLE_MAPPINGS[filename]
+                self.import_file(filename, table_name)
+            else:
+                print(f"Warning: No table mapping defined for {filename}")
+
+        print("\nAll imports finished.")

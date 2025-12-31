@@ -4,6 +4,7 @@ CREATE TABLE Classe (
 	CodClasse VARCHAR(50), -- e.g., 'MBA', 'ATE'
 	PRIMARY KEY (IDClasse)
 );
+GO
 
 CREATE TABLE Asteroide (
 	IDAsteroide INT IDENTITY(1,1) NOT NULL,
@@ -21,12 +22,14 @@ CREATE TABLE Asteroide (
 	albedo DECIMAL(10, 5),
 	PRIMARY KEY (IDAsteroide)
 );
+GO
 
 -- Indexes for Asteroide
 CREATE UNIQUE NONCLUSTERED INDEX IX_Asteroide_spkid ON Asteroide(spkid) WHERE spkid IS NOT NULL;
 CREATE INDEX IX_Asteroide_pdes ON Asteroide(pdes);
 CREATE INDEX IX_Asteroide_number ON Asteroide(number) WHERE number IS NOT NULL;
 CREATE INDEX IX_Asteroide_Flags ON Asteroide(pha, neo) INCLUDE (diameter, H);
+GO
 
 CREATE TABLE Orbita (
 	IDOrbita INT IDENTITY(1,1) NOT NULL,
@@ -73,6 +76,7 @@ CREATE TABLE Orbita (
 	FOREIGN KEY (IDAsteroide) REFERENCES Asteroide(IDAsteroide),
 	FOREIGN KEY (IDClasse) REFERENCES Classe(IDClasse)
 );
+GO
 
 -- Indexes for Orbita
 CREATE UNIQUE INDEX UQ_Orbita_Asteroide_Epoch ON Orbita(IDAsteroide, epoch) WITH (IGNORE_DUP_KEY = ON);
@@ -85,6 +89,7 @@ CREATE TABLE Centro_de_observacao (
 	Localizacao VARCHAR(100),
 	PRIMARY KEY (IDCentro)
 );
+GO
 
 CREATE TABLE Astronomo (
 	IDAstronomo INT IDENTITY(1,1) NOT NULL,
@@ -93,6 +98,7 @@ CREATE TABLE Astronomo (
 	PRIMARY KEY (IDAstronomo),
 	FOREIGN KEY (IDCentro) REFERENCES Centro_de_observacao(IDCentro)
 );
+GO
 
 CREATE TABLE Equipamento (
 	IDEquipamento INT IDENTITY(1,1) NOT NULL,
@@ -102,6 +108,7 @@ CREATE TABLE Equipamento (
 	PRIMARY KEY (IDEquipamento),
 	FOREIGN KEY (IDCentro) REFERENCES Centro_de_observacao(IDCentro)
 );
+GO
 
 CREATE TABLE Software (
 	IDSoftware INT IDENTITY(1,1) NOT NULL,
@@ -109,6 +116,7 @@ CREATE TABLE Software (
 	Versao VARCHAR(20),
 	PRIMARY KEY (IDSoftware)
 );
+GO
 
 CREATE TABLE Observacao (
 	IDObservacao INT IDENTITY(1,1) NOT NULL,
@@ -126,6 +134,7 @@ CREATE TABLE Observacao (
 	FOREIGN KEY (IDEquipamento) REFERENCES Equipamento(IDEquipamento),
 	FOREIGN KEY (IDSoftware) REFERENCES Software(IDSoftware)
 );
+GO
 
 CREATE TABLE Imagem (
 	ID_Imagem INT IDENTITY(1,1) NOT NULL,
@@ -136,6 +145,7 @@ CREATE TABLE Imagem (
 	PRIMARY KEY (ID_Imagem),
 	FOREIGN KEY (IDAsteroide) REFERENCES Asteroide(IDAsteroide)
 );
+GO
 
 CREATE TABLE Alerta (
 	ID_Alerta INT IDENTITY(1,1) NOT NULL,
@@ -148,3 +158,4 @@ CREATE TABLE Alerta (
 	PRIMARY KEY (ID_Alerta),
 	FOREIGN KEY (IDAsteroide) REFERENCES Asteroide(IDAsteroide)
 );
+GO
