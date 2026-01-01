@@ -12,7 +12,10 @@ from .config import (
     MASK_ORBIT_TYPE, ORBIT_TYPES, MASK_NEO, MASK_PHA,
     MASK_1KM_NEO, MASK_CRITICAL_LIST, MASK_1_OPPOSITION
 )
-from .utils import ensure_directory, unpack_designation, unpack_packed_date, calculate_tp
+from .utils import (
+    ensure_directory, unpack_designation, unpack_packed_date,
+    calculate_tp, expand_scientific_notation, clean_text_for_csv
+)
 
 # --- Worker Function ---
 
@@ -47,10 +50,11 @@ def process_chunk_worker(chunk: pd.DataFrame) -> pd.DataFrame:
     ad_float = a_float * (1.0 + e_float)
     per_float = np.divide(360.0, n_float, out=np.zeros_like(n_float), where=n_float!=0)
 
-    # Store derived values as strings (rounded to avoid base2 mess in output)
-    chunk['q'] = np.round(q_float, 8).astype(str)
-    chunk['ad'] = np.round(ad_float, 8).astype(str)
-    chunk['per'] = np.round(per_float, 2).astype(str)
+    # Store derived values as strings (rounded and formatted to avoid scientific notation)
+    # Use list comprehension with the helper to ensure decimal formatting
+    chunk['q'] = [expand_scientific_notation(x) for x in np.round(q_float, 8)]
+    chunk['ad'] = [expand_scientific_notation(x) for x in np.round(ad_float, 8)]
+    chunk['per'] = [expand_scientific_notation(x) for x in np.round(per_float, 2)]
 
     # 4. Hex Flag Decoding (List Comp + Bitwise)
     hex_list = [
@@ -301,6 +305,9 @@ class AsteroidProcessor:
             if self.software_map and 'mpcorb_software.csv' in self.file_handles:
                 df_soft = pd.DataFrame(list(self.software_map.items()), columns=['Nome', 'IDSoftware'])
                 df_soft['Versao'] = ""
+                # Clean Names
+                df_soft['Nome'] = df_soft['Nome'].apply(clean_text_for_csv)
+
                 df_soft[['IDSoftware', 'Nome', 'Versao']].to_csv(
                     self.file_handles['mpcorb_software.csv'],
                     mode='a', header=False, index=False
@@ -310,6 +317,9 @@ class AsteroidProcessor:
             if self.astronomer_map and 'mpcorb_astronomers.csv' in self.file_handles:
                 df_astro = pd.DataFrame(list(self.astronomer_map.items()), columns=['Nome', 'IDAstronomo'])
                 df_astro['IDCentro'] = ""
+                # Clean Names
+                df_astro['Nome'] = df_astro['Nome'].apply(clean_text_for_csv)
+
                 df_astro[['IDAstronomo', 'Nome', 'IDCentro']].to_csv(
                     self.file_handles['mpcorb_astronomers.csv'],
                     mode='a', header=False, index=False
@@ -318,7 +328,12 @@ class AsteroidProcessor:
             # 3. Classes
             if self.class_map and 'mpcorb_classes.csv' in self.file_handles:
                 df_class = pd.DataFrame(list(self.class_map.items()), columns=['Descricao', 'IDClasse'])
+
+                # Apply Text Cleaning to Description (removes commas and en-dashes)
+                df_class['Descricao'] = df_class['Descricao'].apply(clean_text_for_csv)
+
                 df_class['CodClasse'] = df_class['Descricao'] # Map Descricao to CodClasse as fallback
+
                 df_class[['IDClasse', 'Descricao', 'CodClasse']].to_csv(
                     self.file_handles['mpcorb_classes.csv'],
                     mode='a', header=False, index=False
@@ -341,12 +356,16 @@ class AsteroidProcessor:
         df_ast['number'] = chunk['number_str'].fillna("")
         df_ast['spkid'] = ""
         df_ast['pdes'] = chunk['pdes_parsed']
-        df_ast['name'] = chunk['name_parsed']
+        # Clean Name
+        df_ast['name'] = chunk['name_parsed'].apply(clean_text_for_csv)
         df_ast['prefix'] = ""
         df_ast['neo'] = chunk['is_neo_flag']
         df_ast['pha'] = chunk['is_pha_flag']
-        df_ast['H'] = chunk['abs_mag'].fillna("")
-        df_ast['G'] = chunk['slope_param'].fillna("")
+
+        # Apply expansion to float columns in Asteroide
+        df_ast['H'] = [expand_scientific_notation(x) for x in chunk['abs_mag']]
+        df_ast['G'] = [expand_scientific_notation(x) for x in chunk['slope_param']]
+
         df_ast['diameter'] = ""
         df_ast['diameter_sigma'] = ""
         df_ast['albedo'] = ""
@@ -376,25 +395,26 @@ class AsteroidProcessor:
         df_orb['IDOrbita'] = chunk['IDOrbita']
         df_orb['IDAsteroide'] = chunk['IDAsteroide']
         df_orb['epoch'] = chunk['epoch_iso']
-        # PASS THROUGH ORIGINAL STRINGS
-        df_orb['e'] = chunk['eccentricity'].fillna("")
-        df_orb['a'] = chunk['semi_major_axis'].fillna("")
-        df_orb['i'] = chunk['inclination'].fillna("")
-        df_orb['om'] = chunk['long_asc_node'].fillna("")
-        df_orb['w'] = chunk['arg_perihelion'].fillna("")
-        df_orb['ma'] = chunk['mean_anomaly'].fillna("")
-        df_orb['n'] = chunk['mean_motion'].fillna("")
+
+        # USE HELPER TO REMOVE SCIENTIFIC NOTATION
+        df_orb['e'] = [expand_scientific_notation(x) for x in chunk['eccentricity']]
+        df_orb['a'] = [expand_scientific_notation(x) for x in chunk['semi_major_axis']]
+        df_orb['i'] = [expand_scientific_notation(x) for x in chunk['inclination']]
+        df_orb['om'] = [expand_scientific_notation(x) for x in chunk['long_asc_node']]
+        df_orb['w'] = [expand_scientific_notation(x) for x in chunk['arg_perihelion']]
+        df_orb['ma'] = [expand_scientific_notation(x) for x in chunk['mean_anomaly']]
+        df_orb['n'] = [expand_scientific_notation(x) for x in chunk['mean_motion']]
 
         df_orb['tp'] = chunk['tp']
         df_orb['moid'] = ""
         df_orb['moid_ld'] = ""
 
-        # Use calculated strings for derived columns
+        # Use calculated strings (already cleaned in process_chunk_worker)
         df_orb['q'] = chunk['q']
         df_orb['ad'] = chunk['ad']
         df_orb['per'] = chunk['per']
 
-        df_orb['rms'] = chunk.get('rms_residual', "")
+        df_orb['rms'] = [expand_scientific_notation(x) for x in chunk.get('rms_residual', "")]
         df_orb['Arc'] = chunk.get('first_obs', "").astype(str) + "-" + chunk.get('last_obs', "").astype(str)
 
         empty_cols = ['sigma_e', 'sigma_a', 'sigma_q', 'sigma_i', 'sigma_om', 'sigma_w', 'sigma_ma', 'sigma_ad', 'sigma_n', 'sigma_tp', 'sigma_per']
@@ -406,7 +426,9 @@ class AsteroidProcessor:
         df_orb['IsCriticalList'] = chunk['is_critical']
         df_orb['IsOneOppositionEarlier'] = chunk['is_opp_earlier']
         df_orb['uncertainty'] = chunk.get('uncertainty', "")
-        df_orb['Reference'] = chunk.get('reference', "")
+
+        # Clean Reference
+        df_orb['Reference'] = chunk.get('reference', "").apply(clean_text_for_csv)
 
         num_obs = pd.to_numeric(chunk.get('num_observations', ""), errors='coerce')
         num_obs_filled = num_obs.fillna(-1).astype(int).astype(str)

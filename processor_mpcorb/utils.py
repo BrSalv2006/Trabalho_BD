@@ -1,4 +1,5 @@
 import datetime
+from decimal import Decimal
 from typing import Any, Dict, Optional, Union
 
 # Import constants from the centralized config
@@ -31,15 +32,44 @@ def clean_str(val: Any) -> str:
     s = str(val).strip()
     return "" if s == "" else s
 
-def clean_float(val: Any, decimals: int = None) -> str:
-    try:
-        if not val: return ""
-        f = float(val)
-        if decimals is not None:
-            return f"{f:.{decimals}f}"
-        return str(f)
-    except (ValueError, TypeError):
+def clean_text_for_csv(val: Any) -> str:
+    """
+    Sanitizes text for CSV output to prevent column shifting during BULK INSERT.
+    1. Replaces commas ',' with semicolons ';'.
+    2. Replaces en-dashes '–' with hyphens '-'.
+    3. Strips whitespace.
+    """
+    if val is None:
         return ""
+    s = str(val)
+    if not s or s.lower() in ['nan', '<na>', '']:
+        return ""
+
+    # Replace dangerous characters
+    s = s.replace(',', ';').replace('–', '-')
+    return s.strip()
+
+def expand_scientific_notation(val: Any) -> str:
+    """
+    Converts scientific notation (e.g., 1.23E-4) to a standard decimal string.
+    Uses Decimal to avoid floating-point precision loss.
+    """
+    if val is None:
+        return ""
+    s = str(val).strip()
+    if not s or s.lower() in ['nan', '<na>', '']:
+        return ""
+
+    # Optimization: If it doesn't look like scientific notation, return as is.
+    if 'e' not in s.lower():
+        return s
+
+    try:
+        # Use Decimal to preserve exact precision during expansion
+        d = Decimal(s)
+        return "{:.30f}".format(d).rstrip('0').rstrip('.')
+    except Exception:
+        return s
 
 def _get_base62(char: str) -> int:
     """Fast lookup for Base62 characters."""

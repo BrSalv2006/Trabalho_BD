@@ -6,7 +6,7 @@ from concurrent.futures import ProcessPoolExecutor
 from typing import Dict
 
 from .config import SCHEMAS, INPUT_FILE, CHUNK_SIZE, NEO_DTYPES
-from .utils import ensure_directory
+from .utils import ensure_directory, expand_scientific_notation, clean_text_for_csv
 
 # --- Worker Function ---
 
@@ -206,6 +206,10 @@ class AsteroidProcessor:
                     })
 
                 df_class = pd.DataFrame(class_data)
+
+                # Apply Text Cleaning to Description (removes commas and en-dashes)
+                df_class['Descricao'] = df_class['Descricao'].apply(clean_text_for_csv)
+
                 df_class[['IDClasse', 'Descricao', 'CodClasse']].to_csv(
                     self.file_handles['neo_classes.csv'],
                     mode='a', header=False, index=False
@@ -228,15 +232,18 @@ class AsteroidProcessor:
         df_ast['number'] = chunk['number_clean']
         df_ast['spkid'] = chunk['spkid_clean']
         df_ast['pdes'] = chunk['pdes_clean']
-        df_ast['name'] = chunk['name_clean']
+        # Clean Name
+        df_ast['name'] = chunk['name_clean'].apply(clean_text_for_csv)
         df_ast['prefix'] = chunk['prefix_clean']
         df_ast['neo'] = chunk['neo_flag']
         df_ast['pha'] = chunk['pha_flag']
-        df_ast['H'] = chunk['h'].fillna("")
+
+        # Expand Scientific Notation for Float Fields
+        df_ast['H'] = [expand_scientific_notation(x) for x in chunk['h']]
         df_ast['G'] = ""
-        df_ast['diameter'] = chunk['diameter'].fillna("")
-        df_ast['diameter_sigma'] = chunk['diameter_sigma'].fillna("")
-        df_ast['albedo'] = chunk['albedo'].fillna("")
+        df_ast['diameter'] = [expand_scientific_notation(x) for x in chunk['diameter']]
+        df_ast['diameter_sigma'] = [expand_scientific_notation(x) for x in chunk['diameter_sigma']]
+        df_ast['albedo'] = [expand_scientific_notation(x) for x in chunk['albedo']]
 
         df_ast.to_csv(self.file_handles['neo_asteroids.csv'], mode='a', header=False, index=False)
 
@@ -246,14 +253,14 @@ class AsteroidProcessor:
         df_orb['IDAsteroide'] = chunk['IDAsteroide']
         df_orb['epoch'] = chunk['epoch_iso']
 
-        # Map simple columns (passed through as Strings)
+        # Map simple columns (Use expand_scientific_notation for all floats)
         pass_through_cols = {
             'e': 'e', 'a': 'a', 'i': 'i', 'om': 'om', 'w': 'w',
             'ma': 'ma', 'n': 'n', 'q': 'q', 'ad': 'ad',
             'per': 'per', 'rms': 'rms', 'moid': 'moid', 'moid_ld': 'moid_ld'
         }
         for target, source in pass_through_cols.items():
-            df_orb[target] = chunk[source].fillna("")
+            df_orb[target] = [expand_scientific_notation(x) for x in chunk[source]]
 
         df_orb['tp'] = chunk['tp_iso']
         df_orb['Arc'] = ""
@@ -266,7 +273,7 @@ class AsteroidProcessor:
             'sigma_tp': 'sigma_tp', 'sigma_per': 'sigma_per'
         }
         for target, source in sigma_cols.items():
-            df_orb[target] = chunk[source].fillna("")
+            df_orb[target] = [expand_scientific_notation(x) for x in chunk[source]]
 
         df_orb['Hex_Flags'] = ""
         df_orb['Is1kmNEO'] = ""
