@@ -267,7 +267,8 @@ class DataMerger:
 			src = os.path.join(DIR_MPC, INPUT_MAP_MPC[key])
 			if os.path.exists(src):
 				df = pd.read_csv(src, dtype=str, low_memory=False)
-				df['IDCentro'] = '1'
+				if key == 'astronomers':
+					df['IDCentro'] = '1'
 				self._save(df, FILES[key])
 
 	def _save(self, df, filename):

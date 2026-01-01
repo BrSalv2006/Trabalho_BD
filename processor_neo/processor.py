@@ -66,6 +66,8 @@ def process_chunk_worker(chunk: pd.DataFrame) -> pd.DataFrame:
 	chunk.loc[chunk['class_clean'].isin(['nan', '', '<NA>']), 'class_clean'] = np.nan
 
 	chunk['class_desc_clean'] = chunk['class_description'].astype(str).str.strip()
+	chunk['class_desc_clean'] = chunk['class_desc_clean'].str.replace(',', ';', regex=False)
+	chunk['class_desc_clean'] = chunk['class_desc_clean'].str.replace('–', '-', regex=False).str.replace('—', '-', regex=False)
 	chunk.loc[chunk['class_desc_clean'].isin(['nan', '', '<NA>']), 'class_desc_clean'] = np.nan
 
 	# 5. Number Parsing
