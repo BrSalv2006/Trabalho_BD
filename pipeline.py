@@ -4,12 +4,10 @@ import sys
 
 # --- Import Processors ---
 try:
-    from processor_mpcorb.processor import AsteroidProcessor as MPCProcessor
-    from processor_mpcorb.config import INPUT_FILE as MPC_INPUT, OUTPUT_DIR as MPC_OUTPUT
-    from processor_neo.processor import AsteroidProcessor as NEOProcessor
-    from processor_neo.config import INPUT_FILE as NEO_INPUT, OUTPUT_DIR as NEO_OUTPUT
-    from merger.merger import DataMerger
-    from importer.importer import DBImporter
+    from processor_mpcorb import config as MPCProcessorConfig, processor as MPCProcessor
+    from processor_neo import config as NEOProcessorConfig, processor as NEOProcessor
+    from merger import merger as DataMerger
+    #from importer import importer as DBImporter
 
 except ImportError as e:
     print(f"CRITICAL ERROR: Could not import necessary modules. Check your file structure.")
@@ -30,15 +28,15 @@ def run_pipeline():
     print("[Step 1/4] Processing MPCORB Dataset...")
     print("-"*40)
 
-    if os.path.exists(MPC_INPUT):
+    if os.path.exists(MPCProcessorConfig.INPUT_FILE):
         try:
-            mpc_processor = MPCProcessor(MPC_INPUT, MPC_OUTPUT)
+            mpc_processor = MPCProcessor.AsteroidProcessor(MPCProcessorConfig.INPUT_FILE, MPCProcessorConfig.OUTPUT_DIR)
             mpc_processor.process()
         except Exception as e:
             print(f"[ERROR] MPCORB Processing failed: {e}")
             # We continue? Usually merger fails without this, but let's try to proceed.
     else:
-        print(f"[SKIP] MPCORB Input file not found: {MPC_INPUT}")
+        print(f"[SKIP] MPCORB Input file not found: {MPCProcessorConfig.INPUT_FILE}")
 
     # ---------------------------------------------------------
     # STEP 2: Process NEO Dataset
@@ -47,14 +45,14 @@ def run_pipeline():
     print("[Step 2/4] Processing NEO Dataset...")
     print("-"*40)
 
-    if os.path.exists(NEO_INPUT):
+    if os.path.exists(NEOProcessorConfig.INPUT_FILE):
         try:
-            neo_processor = NEOProcessor(NEO_INPUT, NEO_OUTPUT)
+            neo_processor = NEOProcessor.AsteroidProcessor(NEOProcessorConfig.INPUT_FILE, NEOProcessorConfig.OUTPUT_DIR)
             neo_processor.process()
         except Exception as e:
             print(f"[ERROR] NEO Processing failed: {e}")
     else:
-        print(f"[SKIP] NEO Input file not found: {NEO_INPUT}")
+        print(f"[SKIP] NEO Input file not found: {NEOProcessorConfig.INPUT_FILE}")
 
     # ---------------------------------------------------------
     # STEP 3: Merge Datasets
@@ -64,7 +62,7 @@ def run_pipeline():
     print("-"*40)
 
     try:
-        merger = DataMerger()
+        merger = DataMerger.DataMerger()
         merger.run()
     except Exception as e:
         print(f"[ERROR] Merging failed: {e}")
@@ -74,15 +72,15 @@ def run_pipeline():
     # ---------------------------------------------------------
     # STEP 4: Import to Database
     # ---------------------------------------------------------
-    print("\n" + "-"*40)
-    print("[Step 4/4] Importing to Database...")
-    print("-"*40)
-
-    try:
-        importer = DBImporter()
-        importer.run()
-    except Exception as e:
-        print(f"[ERROR] Database Import failed: {e}")
+    #print("\n" + "-"*40)
+    #print("[Step 4/4] Importing to Database...")
+    #print("-"*40)
+#
+    #try:
+    #    importer = DBImporter()
+    #    importer.run()
+    #except Exception as e:
+    #    print(f"[ERROR] Database Import failed: {e}")
 
     # ---------------------------------------------------------
     # Final Summary

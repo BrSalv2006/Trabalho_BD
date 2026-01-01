@@ -3,7 +3,7 @@ import time
 import mssql_python
 import pandas as pd
 import numpy as np
-from config import (
+from .config import (
     DB_CONFIG, INPUT_DIR, BATCH_SIZE,
     TABLE_MAPPINGS, IMPORT_ORDER, IDENTITY_TABLES, STRING_LIMITS
 )

@@ -2,7 +2,7 @@ import datetime
 from typing import Any, Dict, Optional, Union
 
 # Import constants from the centralized config
-from config import (
+from .config import (
     CENTURY_MAP, MONTH_MAP, DAY_MAP_OFFSET,
     PLANET_MAP, CENTURY_PREFIX_MAP, ORBIT_TYPES,
     MASK_ORBIT_TYPE, MASK_NEO, MASK_1KM_NEO,
