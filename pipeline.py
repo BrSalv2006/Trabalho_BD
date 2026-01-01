@@ -4,7 +4,7 @@ import time
 import os
 import sys
 
-debug = True
+debug = False
 clean = False
 
 # --- Import Processors ---

@@ -40,6 +40,7 @@ INPUT_MAP_NEO = {
 # --- Data Types for Fast Loading ---
 MERGE_DTYPES = {
     'IDAsteroide': 'string',
+    'IDOrbita': 'string',
     'number': 'string',
     'pdes': 'string',
     'name': 'string'

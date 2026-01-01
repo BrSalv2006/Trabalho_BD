@@ -13,6 +13,10 @@ class DataMerger:
         self.mpc_class_map = None
         self.neo_class_map = None
 
+        # Orbit ID maps (Added for IDOrbita support)
+        self.mpc_orbit_map = None
+        self.neo_orbit_map = None
+
     def _create_match_key(self, df):
         """
         Creates a single normalized column for matching duplicates using vectorization.
@@ -147,31 +151,51 @@ class DataMerger:
         self._save(df_merged, FILES['asteroids'])
         print(f"Merged Asteroids saved. Total count: {len(df_merged)}")
 
-    def _update_ids(self, df, id_map_series):
+    def _update_ids(self, df, id_map_series, column='IDAsteroide'):
         """
-        Updates 'IDAsteroide' using vectorized mapping.
+        Updates an ID column using vectorized mapping.
         """
-        if df.empty: return df
+        if df.empty or id_map_series is None or column not in df.columns:
+            return df
+
         # map() with a Series uses optimized index lookup
-        df['IDAsteroide'] = df['IDAsteroide'].map(id_map_series)
-        # We removed .dropna() so that observations without a linked asteroid
-        # (orphans) are preserved with IDAsteroide as NaN/Empty,
-        # instead of being deleted.
+        # We use fillna() to keep original IDs if they aren't in the map (orphans)
+        df[column] = df[column].map(id_map_series).fillna(df[column])
         return df
 
     def merge_orbits(self):
         print("Merging Orbits tables...")
+
+        # We need to regenerate IDOrbita to avoid collisions between MPC and NEO
+        current_orbit_id = 1
 
         # 1. Process MPC Orbits
         path_mpc = os.path.join(DIR_MPC, INPUT_MAP_MPC['orbits'])
         df_mpc = pd.read_csv(path_mpc, dtype=str, low_memory=False)
 
         # Update Asteroid IDs
-        df_mpc = self._update_ids(df_mpc, self.mpc_id_map)
+        df_mpc = self._update_ids(df_mpc, self.mpc_id_map, 'IDAsteroide')
 
         # Update Class IDs if map exists
         if self.mpc_class_map is not None and 'IDClasse' in df_mpc.columns:
             df_mpc['IDClasse'] = df_mpc['IDClasse'].map(self.mpc_class_map).fillna(df_mpc['IDClasse'])
+
+        # Regenerate IDOrbita for MPC
+        if not df_mpc.empty:
+            count_mpc = len(df_mpc)
+            # Create new IDs
+            new_ids_mpc = np.arange(current_orbit_id, current_orbit_id + count_mpc).astype(str)
+
+            # Create Map: Old IDOrbita -> New IDOrbita
+            # We need to preserve the old ID temporarily to build the map
+            # Assuming IDOrbita exists and is unique per file
+            self.mpc_orbit_map = pd.Series(new_ids_mpc, index=df_mpc['IDOrbita'])
+
+            # Assign new IDs
+            df_mpc['IDOrbita'] = new_ids_mpc
+            current_orbit_id += count_mpc
+        else:
+            self.mpc_orbit_map = None
 
         # 2. Process NEO Orbits
         path_neo = os.path.join(DIR_NEO, INPUT_MAP_NEO['orbits'])
@@ -179,38 +203,59 @@ class DataMerger:
             df_neo = pd.read_csv(path_neo, dtype=str, low_memory=False)
 
             # Update Asteroid IDs
-            df_neo = self._update_ids(df_neo, self.neo_id_map)
+            df_neo = self._update_ids(df_neo, self.neo_id_map, 'IDAsteroide')
 
             # Update Class IDs if map exists
             if self.neo_class_map is not None and 'IDClasse' in df_neo.columns:
                 df_neo['IDClasse'] = df_neo['IDClasse'].map(self.neo_class_map).fillna(df_neo['IDClasse'])
+
+            # Regenerate IDOrbita for NEO
+            if not df_neo.empty:
+                count_neo = len(df_neo)
+                new_ids_neo = np.arange(current_orbit_id, current_orbit_id + count_neo).astype(str)
+
+                # Create Map
+                self.neo_orbit_map = pd.Series(new_ids_neo, index=df_neo['IDOrbita'])
+
+                # Assign new IDs
+                df_neo['IDOrbita'] = new_ids_neo
+                current_orbit_id += count_neo
+            else:
+                self.neo_orbit_map = None
         else:
             df_neo = pd.DataFrame()
+            self.neo_orbit_map = None
 
         # Concatenate (Vectorized Append)
         df_merged = pd.concat([df_mpc, df_neo], ignore_index=True)
         self._save(df_merged, FILES['orbits'])
+        print(f"Merged Orbits saved. Total count: {len(df_merged)}")
 
     def merge_observations(self):
         print("Merging Observations tables...")
 
+        # 1. Process MPC Observations
         path_mpc = os.path.join(DIR_MPC, INPUT_MAP_MPC['observations'])
         df_mpc = pd.read_csv(path_mpc, dtype=str, low_memory=False)
         print(f"Loaded MPC Observations: {len(df_mpc)}")
-        df_mpc = self._update_ids(df_mpc, self.mpc_id_map)
 
+        # Update IDs using maps
+        df_mpc = self._update_ids(df_mpc, self.mpc_id_map, 'IDAsteroide')
+
+        # 2. Process NEO Observations
         path_neo = os.path.join(DIR_NEO, INPUT_MAP_NEO['observations'])
         if os.path.exists(path_neo):
             df_neo = pd.read_csv(path_neo, dtype=str, low_memory=False)
             print(f"Loaded NEO Observations: {len(df_neo)}")
-            df_neo = self._update_ids(df_neo, self.neo_id_map)
+
+            # Update IDs using maps
+            df_neo = self._update_ids(df_neo, self.neo_id_map, 'IDAsteroide')
         else:
             df_neo = pd.DataFrame()
 
         df_merged = pd.concat([df_mpc, df_neo], ignore_index=True)
 
         # Always generate a new, unique, sequential IDObservacao
-        # This handles cases where input IDs collide or are missing
         df_merged['IDObservacao'] = np.arange(1, len(df_merged) + 1).astype(str)
 
         self._save(df_merged, FILES['observations'])

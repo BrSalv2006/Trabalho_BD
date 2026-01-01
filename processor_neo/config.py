@@ -79,13 +79,11 @@ SCHEMAS = {
         'Data_atualizacao', 'Hora', 'Duracao', 'Modo'
     ],
     'neo_orbits.csv': [
-        'IDAsteroide', 'epoch', 'e', 'a', 'i', 'om', 'w', 'ma', 'n', 'tp',
-        'moid', 'moid_ld', 'q', 'ad', 'per', 'rms', 'Arc',
-        'sigma_e', 'sigma_a', 'sigma_q', 'sigma_i', 'sigma_om', 'sigma_w',
-        'sigma_ma', 'sigma_ad', 'sigma_n', 'sigma_tp', 'sigma_per',
-        'Hex_Flags', 'Is1kmNEO', 'IsCriticalList',
-        'IsOneOppositionEarlier', 'uncertainty', 'Reference', 'Num_Obs',
-        'Num_Opp', 'Coarse_Perts', 'Precise_Perts', 'IDClasse'
+        'IDOrbita', 'IDAsteroide', 'epoch', 'e', 'sigma_e', 'a', 'sigma_a', 'q', 'sigma_q',
+        'i', 'sigma_i', 'om', 'sigma_om','w', 'sigma_w', 'ma', 'sigma_ma','ad','sigma_ad',
+        'n', 'sigma_n', 'tp', 'sigma_tp', 'per', 'sigma_per', 'moid', 'moid_ld','rms', 'uncertainty',
+        'Reference', 'Num_Obs', 'Num_Opp', 'Arc', 'Coarse_Perts', 'Precise_Perts',
+        'Hex_Flags', 'Is1kmNEO', 'IsCriticalList', 'IsOneOppositionEarlier', 'IDClasse'
     ],
     'neo_classes.csv': [
         'IDClasse', 'Descricao', 'CodClasse'

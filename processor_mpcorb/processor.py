@@ -152,6 +152,9 @@ class AsteroidProcessor:
         # Observation ID counter
         self.next_observation_id = 1
 
+        # Added Orbit ID Counter
+        self.next_orbit_id = 1
+
         self.next_asteroid_id = 1
         self.file_handles = {}
 
@@ -258,8 +261,6 @@ class AsteroidProcessor:
                                 return
 
                             # --- FIX: Reset index to ensure alignment with output dataframes ---
-                            # This fixes the issue where subsequent chunks have mismatched indices
-                            # causing NaNs in IDAsteroide/IDSoftware/IDAstronomo
                             chunk.reset_index(drop=True, inplace=True)
                             # -----------------------------------------------------------------
 
@@ -267,7 +268,10 @@ class AsteroidProcessor:
 
                             chunk_len = len(chunk)
                             chunk['IDAsteroide'] = range(self.next_asteroid_id, self.next_asteroid_id + chunk_len)
+                            chunk['IDOrbita'] = range(self.next_orbit_id, self.next_orbit_id + chunk_len)
+
                             self.next_asteroid_id += chunk_len
+                            self.next_orbit_id += chunk_len
 
                             # --- Maps ---
                             self._map_computers_and_astronomers(chunk)
@@ -361,10 +365,15 @@ class AsteroidProcessor:
         df_obs['Hora'] = ""
         df_obs['Duracao'] = ""
         df_obs['Modo'] = "Orbit Computation"
+
+        # Ensure correct column order
+        df_obs = df_obs[SCHEMAS['mpcorb_observations.csv']]
+
         df_obs.to_csv(self.file_handles['mpcorb_observations.csv'], mode='a', header=False, index=False)
 
         # mpcorb_orbits.csv
         df_orb = pd.DataFrame()
+        df_orb['IDOrbita'] = chunk['IDOrbita']
         df_orb['IDAsteroide'] = chunk['IDAsteroide']
         df_orb['epoch'] = chunk['epoch_iso']
         # PASS THROUGH ORIGINAL STRINGS

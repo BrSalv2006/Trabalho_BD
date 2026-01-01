@@ -88,6 +88,7 @@ class AsteroidProcessor:
         self.input_path = input_path
         self.output_dir = output_dir
         self.next_asteroid_id = 1
+        self.next_orbit_id = 1
 
         # Observation ID counter
         self.next_observation_id = 1
@@ -169,7 +170,10 @@ class AsteroidProcessor:
 
                             chunk_len = len(chunk)
                             chunk['IDAsteroide'] = range(self.next_asteroid_id, self.next_asteroid_id + chunk_len)
+                            chunk['IDOrbita'] = range(self.next_orbit_id, self.next_orbit_id + chunk_len)
+
                             self.next_asteroid_id += chunk_len
+                            self.next_orbit_id += chunk_len
 
                             self._map_classes(chunk)
                             self._write_tables(chunk)
@@ -238,6 +242,7 @@ class AsteroidProcessor:
 
         # neo_orbits.csv
         df_orb = pd.DataFrame()
+        df_orb['IDOrbita'] = chunk['IDOrbita']
         df_orb['IDAsteroide'] = chunk['IDAsteroide']
         df_orb['epoch'] = chunk['epoch_iso']
 
@@ -295,5 +300,8 @@ class AsteroidProcessor:
         df_obs['Hora'] = ""
         df_obs['Duracao'] = ""
         df_obs['Modo'] = ""
+
+        # Ensure correct order
+        df_obs = df_obs[SCHEMAS['neo_observations.csv']]
 
         df_obs.to_csv(self.file_handles['neo_observations.csv'], mode='a', header=False, index=False)
