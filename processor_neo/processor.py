@@ -55,13 +55,10 @@ def process_chunk_worker(chunk: pd.DataFrame) -> pd.DataFrame:
 	chunk['pha_flag'] = np.where(chunk['pha'].fillna('N') == 'Y', '1', '0')
 
 	# 4. String Cleaning
-	chunk['name_clean'] = chunk['name'].fillna("").astype(str).str.strip()
-	chunk['pdes_clean'] = chunk['pdes'].fillna("").astype(str).str.strip()
 	chunk['prefix_clean'] = chunk['prefix'].fillna("").astype(str).str.strip()
 	chunk['spkid_clean'] = chunk['spkid'].fillna("").astype(str).str.strip()
 
 	# Clean Class Code and Class Description
-	# Use Real Nulls (NaN) for missing data
 	chunk['class_clean'] = chunk['class'].astype(str).str.strip()
 	chunk.loc[chunk['class_clean'].isin(['nan', '', '<NA>']), 'class_clean'] = np.nan
 
@@ -70,13 +67,56 @@ def process_chunk_worker(chunk: pd.DataFrame) -> pd.DataFrame:
 	chunk['class_desc_clean'] = chunk['class_desc_clean'].str.replace('–', '-', regex=False).str.replace('—', '-', regex=False)
 	chunk.loc[chunk['class_desc_clean'].isin(['nan', '', '<NA>']), 'class_desc_clean'] = np.nan
 
-	# 5. Number Parsing
-	id_str = chunk['id'].astype(str)
-	is_numbered = id_str.str.startswith('a', na=False)
+	# 5. Advanced Designation Parsing
+
+	# Prepare Source Columns
+	chunk['full_name_clean'] = chunk['full_name'].fillna("").astype(str).str.strip()
+	chunk['id_str'] = chunk['id'].fillna("").astype(str).str.strip()
+
+	# Name: Always use the 'name' column as the primary source for the Name field
+	if 'name' in chunk.columns:
+		chunk['name_clean'] = chunk['name'].fillna("").astype(str).str.strip()
+	else:
+		chunk['name_clean'] = ""
+
+	# Identify Types
+	is_numbered = chunk['id_str'].str.startswith('a', na=False)
+	is_unnumbered = chunk['id_str'].str.startswith('b', na=False)
 
 	chunk['number_clean'] = ""
+	chunk['pdes_clean'] = ""
+
+	# --- Logic for Numbered Asteroids (ID starts with 'a') ---
 	if is_numbered.any():
-		chunk.loc[is_numbered, 'number_clean'] = id_str.loc[is_numbered].str[1:].str.lstrip('0')
+		# 1. Number: Parse from ID (remove 'a' and leading zeros)
+		chunk.loc[is_numbered, 'number_clean'] = chunk.loc[is_numbered, 'id_str'].str[1:].str.lstrip('0')
+
+		# 2. Pdes: Extract from Full Name if present in parentheses at the end
+		# Example: "28394 Mittag-Leffler (1999 RY36)" -> Pdes is "1999 RY36"
+		pattern_pdes = r'\s+\((?P<pdes>[^\)]+)\)$'
+
+		extracted = chunk.loc[is_numbered, 'full_name_clean'].str.extract(pattern_pdes)
+		mask_found = extracted['pdes'].notna()
+
+		if mask_found.any():
+			chunk.loc[mask_found.index[mask_found], 'pdes_clean'] = extracted.loc[mask_found, 'pdes'].str.strip()
+
+			# Fallback for Numbered: If no parens found, check if remainder has digits (like MPC logic)
+			# This handles edge cases where full_name might lack parens but still have pdes info.
+			# However, since we prioritize extraction, we leave pdes_clean empty if not found,
+			# unless we want to try using the 'pdes' column as a fallback?
+			# For now, adhering to strict extraction from full_name as primary for Numbered.
+
+	# --- Logic for Unnumbered Asteroids (ID starts with 'b') ---
+	if is_unnumbered.any():
+		# Number is empty
+
+		# Pdes: Use the 'pdes' column directly as requested
+		if 'pdes' in chunk.columns:
+			chunk.loc[is_unnumbered, 'pdes_clean'] = chunk.loc[is_unnumbered, 'pdes'].fillna("").astype(str).str.strip()
+		else:
+			# Fallback if pdes column is missing (defensive)
+			chunk.loc[is_unnumbered, 'pdes_clean'] = chunk.loc[is_unnumbered, 'full_name_clean']
 
 	return chunk
 
