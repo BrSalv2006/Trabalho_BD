@@ -1,6 +1,6 @@
 import os
 import sys
-from config import INPUT_FILE, OUTPUT_DIR
+from processor_mpcorb.config import INPUT_FILE, OUTPUT_DIR
 from processor import AsteroidProcessor
 
 def main():

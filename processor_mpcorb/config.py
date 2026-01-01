@@ -18,19 +18,20 @@ CHUNK_SIZE = 100000
 DATE_FORMAT = '%Y-%m-%d %H:%M:%S'
 
 # --- Pandas Optimization: Dtypes for MPCORB ---
+# Using string instead of float32 to avoid precision loss.
 MPCORB_DTYPES = {
     'designation': 'string',
     'epoch': 'string',
     'hex_flags': 'string',
-    'abs_mag': 'float32',
-    'slope_param': 'float32',
-    'mean_anomaly': 'float32',
-    'arg_perihelion': 'float32',
-    'long_asc_node': 'float32',
-    'inclination': 'float32',
-    'eccentricity': 'float32',
-    'mean_motion': 'float32',
-    'semi_major_axis': 'float32',
+    'abs_mag': 'string',
+    'slope_param': 'string',
+    'mean_anomaly': 'string',
+    'arg_perihelion': 'string',
+    'long_asc_node': 'string',
+    'inclination': 'string',
+    'eccentricity': 'string',
+    'mean_motion': 'string',
+    'semi_major_axis': 'string',
     'uncertainty': 'string',
     'reference': 'string',
     'num_observations': 'string',

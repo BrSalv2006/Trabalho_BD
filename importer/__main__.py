@@ -1,7 +1,7 @@
 import sys
 import os
 from importer import DBImporter
-from config import INPUT_DIR
+from importer.config import INPUT_DIR
 
 def main():
     print("=== Database Bulk Importer ===")

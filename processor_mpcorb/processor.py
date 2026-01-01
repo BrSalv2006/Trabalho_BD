@@ -6,13 +6,13 @@ from typing import Dict, Set
 from concurrent.futures import ProcessPoolExecutor, as_completed
 
 # Import config and utils
-from config import (
+from processor_mpcorb.config import (
     SCHEMAS, INPUT_FILE, CHUNK_SIZE, MPCORB_DTYPES,
     SOFTWARE_PREFIXES, SOFTWARE_SPECIFIC_NAMES,
     MASK_ORBIT_TYPE, ORBIT_TYPES, MASK_NEO, MASK_PHA,
     MASK_1KM_NEO, MASK_CRITICAL_LIST, MASK_1_OPPOSITION
 )
-from utils import ensure_directory, unpack_designation, unpack_packed_date, calculate_tp
+from processor_mpcorb.utils import ensure_directory, unpack_designation, unpack_packed_date, calculate_tp
 
 # --- Worker Function ---
 
@@ -36,17 +36,21 @@ def process_chunk_worker(chunk: pd.DataFrame) -> pd.DataFrame:
         chunk.loc[~is_numeric, 'obj_id'] = [unpack_designation(x) for x in complex_desigs]
 
     # 3. Vectorized Math (Numpy)
-    e = chunk['eccentricity'].fillna(0).values
-    a = chunk['semi_major_axis'].fillna(0).values
-    n = chunk['mean_motion'].fillna(0).values
+    # Convert to float ONLY for calculation, handle errors
+    e_float = pd.to_numeric(chunk['eccentricity'], errors='coerce').fillna(0).values
+    a_float = pd.to_numeric(chunk['semi_major_axis'], errors='coerce').fillna(0).values
+    n_float = pd.to_numeric(chunk['mean_motion'], errors='coerce').fillna(0).values
+    ma_float = pd.to_numeric(chunk['mean_anomaly'], errors='coerce').fillna(0).values
 
-    chunk['e'] = e
-    chunk['a'] = a
-    chunk['n'] = n
+    # Derived Calculations (Must be floats)
+    q_float = a_float * (1.0 - e_float)
+    ad_float = a_float * (1.0 + e_float)
+    per_float = np.divide(360.0, n_float, out=np.zeros_like(n_float), where=n_float!=0)
 
-    chunk['q'] = a * (1.0 - e)
-    chunk['ad'] = a * (1.0 + e)
-    chunk['per'] = np.divide(360.0, n, out=np.zeros_like(n), where=n!=0)
+    # Store derived values as strings (rounded to avoid base2 mess in output)
+    chunk['q'] = np.round(q_float, 8).astype(str)
+    chunk['ad'] = np.round(ad_float, 8).astype(str)
+    chunk['per'] = np.round(per_float, 2).astype(str)
 
     # 4. Hex Flag Decoding (List Comp + Bitwise)
     hex_list = [
@@ -66,11 +70,11 @@ def process_chunk_worker(chunk: pd.DataFrame) -> pd.DataFrame:
     # 5. Date Parsing (List Comp)
     chunk['epoch_iso'] = [unpack_packed_date(x) for x in chunk['epoch']]
 
-    # 6. Tp Calculation (Hybrid: Vectorized for speed, Python Fallback for Range)
+    # 6. Tp Calculation (Requires floats)
     epochs_dt = pd.to_datetime(chunk['epoch_iso'], errors='coerce')
 
-    n_safe = np.where(n != 0, n, np.nan)
-    offset_days = chunk['mean_anomaly'] / n_safe
+    n_safe = np.where(n_float != 0, n_float, np.nan)
+    offset_days = ma_float / n_safe
 
     MAX_DAYS = 106000
 
@@ -83,14 +87,23 @@ def process_chunk_worker(chunk: pd.DataFrame) -> pd.DataFrame:
         valid_epochs = epochs_dt[valid_mask]
         chunk.loc[valid_mask, 'tp'] = (valid_epochs - valid_offsets).dt.strftime('%Y-%m-%d %H:%M:%S.%f').fillna("")
 
-    has_data = (chunk['epoch_iso'] != "") & pd.notna(chunk['mean_anomaly']) & (n != 0)
+    has_data = (chunk['epoch_iso'] != "") & pd.notna(chunk['mean_anomaly']) & (n_float != 0)
     fallback_mask = (~valid_mask) & has_data
 
     if fallback_mask.any():
+        # Fallback uses manual calc
         fallback_subset = chunk.loc[fallback_mask]
+        # Must grab source string columns if calculate_tp expects strings?
+        # utils.calculate_tp usually expects string/float mix. It's safer to pass the float vals we already have.
+        # But `chunk` has strings. Let's rely on the floats we prepared.
+
+        # Zip inputs: epoch string, Mean Anomaly float, Mean Motion float
+        ma_subset = ma_float[fallback_mask]
+        n_subset = n_float[fallback_mask]
+
         chunk.loc[fallback_mask, 'tp'] = [
             calculate_tp(ep, ma, n_val)
-            for ep, ma, n_val in zip(fallback_subset['epoch_iso'], fallback_subset['mean_anomaly'], fallback_subset['n'])
+            for ep, ma, n_val in zip(fallback_subset['epoch_iso'], ma_subset, n_subset)
         ]
 
     # 7. Designation Parsing
@@ -319,8 +332,8 @@ class AsteroidProcessor:
         df_ast['pdes'] = chunk['pdes_parsed']
         df_ast['name'] = chunk['name_parsed']
         df_ast['prefix'] = ""
-        df_ast['H'] = chunk['abs_mag']
-        df_ast['G'] = chunk['slope_param']
+        df_ast['H'] = chunk['abs_mag'].fillna("")
+        df_ast['G'] = chunk['slope_param'].fillna("")
         df_ast['diameter'] = ""
         df_ast['diameter_sigma'] = ""
         df_ast['albedo'] = ""
@@ -344,19 +357,24 @@ class AsteroidProcessor:
         df_orb = pd.DataFrame()
         df_orb['IDAsteroide'] = chunk['IDAsteroide']
         df_orb['epoch'] = chunk['epoch_iso']
-        df_orb['e'] = chunk['e'].round(8)
-        df_orb['a'] = chunk['a'].round(8)
-        df_orb['i'] = chunk['inclination']
-        df_orb['om'] = chunk['long_asc_node']
-        df_orb['w'] = chunk['arg_perihelion']
-        df_orb['ma'] = chunk['mean_anomaly'].round(5)
-        df_orb['n'] = chunk['n'].round(8)
+        # PASS THROUGH ORIGINAL STRINGS
+        df_orb['e'] = chunk['eccentricity'].fillna("")
+        df_orb['a'] = chunk['semi_major_axis'].fillna("")
+        df_orb['i'] = chunk['inclination'].fillna("")
+        df_orb['om'] = chunk['long_asc_node'].fillna("")
+        df_orb['w'] = chunk['arg_perihelion'].fillna("")
+        df_orb['ma'] = chunk['mean_anomaly'].fillna("")
+        df_orb['n'] = chunk['mean_motion'].fillna("")
+
         df_orb['tp'] = chunk['tp']
         df_orb['moid'] = ""
         df_orb['moid_ld'] = ""
-        df_orb['q'] = chunk['q'].round(8)
-        df_orb['ad'] = chunk['ad'].round(8)
-        df_orb['per'] = chunk['per'].round(2)
+
+        # Use calculated strings for derived columns
+        df_orb['q'] = chunk['q']
+        df_orb['ad'] = chunk['ad']
+        df_orb['per'] = chunk['per']
+
         df_orb['rms'] = chunk.get('rms_residual', "")
         df_orb['Arc'] = chunk.get('first_obs', "").astype(str) + "-" + chunk.get('last_obs', "").astype(str)
 

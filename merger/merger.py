@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 import numpy as np
-from config import DIR_MPC, DIR_NEO, OUTPUT_DIR, FILES, INPUT_MAP_MPC, INPUT_MAP_NEO
+from merger.config import DIR_MPC, DIR_NEO, OUTPUT_DIR, FILES, INPUT_MAP_MPC, INPUT_MAP_NEO
 
 class DataMerger:
     def __init__(self):
@@ -217,7 +217,7 @@ class DataMerger:
         path = os.path.join(OUTPUT_DIR, filename)
         if not os.path.exists(OUTPUT_DIR):
             os.makedirs(OUTPUT_DIR)
-        df.to_csv(path, index=False)
+        df.to_csv(path, index=False, na_rep='')
 
     def run(self):
         # We must merge classes first to build the ID map for orbits
