@@ -1,11 +1,16 @@
 import datetime
-from typing import Any
+from decimal import Decimal
+from typing import Any, Dict, Optional, Union
+
+# Import constants from the centralized config
 from .config import (
 	CENTURY_MAP, MONTH_MAP, DAY_MAP_OFFSET,
-	PLANET_MAP, CENTURY_PREFIX_MAP
+	PLANET_MAP, CENTURY_PREFIX_MAP, ORBIT_TYPES,
+	MASK_ORBIT_TYPE, MASK_NEO, MASK_1KM_NEO,
+	MASK_1_OPPOSITION, MASK_CRITICAL_LIST, MASK_PHA
 )
 
-# --- Constants ---
+# --- Constants & Lookups (Optimized) ---
 
 # Base62 Lookup (0-9, A-Z, a-z)
 BASE62_MAP = {
@@ -14,11 +19,50 @@ BASE62_MAP = {
 	)
 }
 
+# --- Core Functions ---
+
+def ensure_directory(path: str):
+	import os
+	if not os.path.exists(path):
+		os.makedirs(path)
+
+def clean_str(val: Any) -> str:
+	if val is None:
+		return ""
+	s = str(val).strip()
+	return "" if s == "" else s
+
+def expand_scientific_notation(val: Any) -> str:
+	"""
+	Converts scientific notation (e.g., 1.23E-4) to a standard decimal string.
+	Uses Decimal to avoid floating-point precision loss.
+	"""
+	if val is None:
+		return ""
+	s = str(val).strip()
+	if not s or s.lower() in ['nan', '<na>', '']:
+		return ""
+
+	# Optimization: If it doesn't look like scientific notation, return as is.
+	# This prevents any casting of standard numbers.
+	if 'e' not in s.lower():
+		return s
+
+	try:
+		# Use Decimal to preserve exact precision during expansion
+		d = Decimal(s)
+		# Format with high precision to capture small numbers, then strip
+		# 30 places covers the DECIMAL(30,10) SQL requirement comfortably
+		return "{:.30f}".format(d).rstrip('0').rstrip('.')
+	except Exception:
+		# Fallback to original string on any error
+		return s
+
 def _get_base62(char: str) -> int:
 	"""Fast lookup for Base62 characters."""
 	return BASE62_MAP.get(char, 0)
 
-# --- Specific MPCORB Unpacking Functions ---
+# --- Date Unpacking ---
 
 def unpack_packed_date(packed_date: str) -> str:
 	"""
@@ -54,10 +98,11 @@ def unpack_packed_date(packed_date: str) -> str:
 	except (ValueError, KeyError, IndexError):
 		return ""
 
+# --- Designation Unpacking ---
+
 def unpack_designation(packed_desig: Any) -> str:
 	"""
 	Robust unpacking of MPC designations (Permanent & Provisional).
-	Handles packed formats like 'K19A01A' -> '2019 AA1'.
 	"""
 	packed = str(packed_desig).strip()
 	length = len(packed)
@@ -123,11 +168,41 @@ def unpack_designation(packed_desig: Any) -> str:
 
 	return packed
 
+# --- Hex & Calculation Utilities ---
+
+def decode_hex_flags(hex_string: str) -> Dict[str, Union[str, bool]]:
+	"""
+	Decodes 4-digit hex flags into dictionary of values.
+	"""
+	if not hex_string or len(hex_string) != 4:
+		return {
+			'orbit_type': 'Unclassified', 'is_neo': False, 'is_pha': False,
+			'is_1km_neo': False, 'is_critical': False, 'is_opp_earlier': False
+		}
+
+	try:
+		val = int(hex_string, 16)
+
+		# Determine Orbit Type
+		otype_id = val & MASK_ORBIT_TYPE
+		orbit_type = ORBIT_TYPES.get(otype_id, "Unclassified")
+
+		return {
+			'orbit_type': orbit_type,
+			'is_neo': bool(val & MASK_NEO),
+			'is_pha': bool(val & MASK_PHA),
+			'is_1km_neo': bool(val & MASK_1KM_NEO),
+			'is_critical': bool(val & MASK_CRITICAL_LIST),
+			'is_opp_earlier': bool(val & MASK_1_OPPOSITION)
+		}
+	except ValueError:
+		return {
+			'orbit_type': 'Unclassified', 'is_neo': False, 'is_pha': False,
+			'is_1km_neo': False, 'is_critical': False, 'is_opp_earlier': False
+		}
+
 def calculate_tp(epoch_str: str, mean_anomaly: float, mean_motion: float) -> str:
-	"""
-	Calculates Time of Perihelion (tp) when it is missing from the dataset.
-	Formula: tp = epoch - (mean_anomaly / mean_motion)
-	"""
+	"""Calculates Time of Perihelion (tp)."""
 	if not epoch_str or not mean_motion or mean_motion == 0:
 		return ""
 	try:
