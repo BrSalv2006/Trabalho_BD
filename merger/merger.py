@@ -5,282 +5,143 @@ from .config import DIR_MPC, DIR_NEO, OUTPUT_DIR, FILES, INPUT_MAP_MPC, INPUT_MA
 
 class DataMerger:
     def __init__(self):
-        # We store ID maps as Pandas Series for vectorized lookups
         self.mpc_id_map = None
         self.neo_id_map = None
-
-        # Class ID maps
         self.mpc_class_map = None
         self.neo_class_map = None
 
-        # Orbit ID maps (Added for IDOrbita support)
-        self.mpc_orbit_map = None
-        self.neo_orbit_map = None
-
     def _create_match_key(self, df):
-        """
-        Creates a single normalized column for matching duplicates using vectorization.
-        Priority: Number > Pdes (Provisional Desig) > Name
-        """
-        # Vectorized String Cleaning
+        """Vectorized key generation for duplication matching."""
         number = df['number'].fillna("").astype(str).str.strip().str.lstrip('0')
         pdes = df['pdes'].fillna("").astype(str).str.strip().str.upper()
         name = df['name'].fillna("").astype(str).str.strip().str.upper()
 
-        # Boolean masks for vectorized selection
-        has_number = number != ""
-        has_pdes = pdes != ""
-
-        # numpy.select evaluates conditions in order on the whole array
-        conditions = [has_number, has_pdes]
+        conditions = [number != "", pdes != ""]
         choices = ["NUM_" + number, "DES_" + pdes]
         default = "NAM_" + name
-
         return np.select(conditions, choices, default=default)
 
+    def _save(self, df, filename):
+        if not os.path.exists(OUTPUT_DIR): os.makedirs(OUTPUT_DIR)
+        df.to_csv(os.path.join(OUTPUT_DIR, filename), index=False, na_rep='')
+
     def merge_classes(self):
-        print("Merging Classes tables...")
+        print("Merging Classes...")
+        # Read
+        df_mpc = self._read_csv(DIR_MPC, INPUT_MAP_MPC['classes'], ['IDClasse', 'Descricao', 'CodClasse'])
+        df_neo = self._read_csv(DIR_NEO, INPUT_MAP_NEO['classes'], ['IDClasse', 'Descricao', 'CodClasse'])
 
-        # 1. Load MPC Classes
-        path_mpc = os.path.join(DIR_MPC, INPUT_MAP_MPC['classes'])
-        if os.path.exists(path_mpc):
-            df_mpc = pd.read_csv(path_mpc, dtype=str)
-        else:
-            df_mpc = pd.DataFrame(columns=['IDClasse', 'Descricao', 'CodClasse'])
-
-        # 2. Load NEO Classes
-        path_neo = os.path.join(DIR_NEO, INPUT_MAP_NEO['classes'])
-        if os.path.exists(path_neo):
-            df_neo = pd.read_csv(path_neo, dtype=str)
-        else:
-            df_neo = pd.DataFrame(columns=['IDClasse', 'Descricao', 'CodClasse'])
-
-        # 3. Combine and Deduplicate based on 'CodClasse'
-        # Concatenate
+        # Combine
         all_classes = pd.concat([df_mpc, df_neo], ignore_index=True)
-
-        # Filter invalid rows just in case
         all_classes = all_classes[all_classes['CodClasse'].notna() & (all_classes['CodClasse'] != "")].copy()
 
-        # Drop duplicates on CodClasse, keeping the first occurrence
-        unique_classes = all_classes.drop_duplicates(subset=['CodClasse']).copy()
-
-        # 4. Generate New IDs
+        # Deduplicate
+        unique_classes = all_classes.drop_duplicates(subset=['CodClasse']).reset_index(drop=True)
         unique_classes['New_ID'] = np.arange(1, len(unique_classes) + 1).astype(str)
 
-        # 5. Build Mapping Dictionaries (Old ID -> CodClasse -> New ID)
-
-        # Map for MPC
+        # Build Maps
         if not df_mpc.empty:
-            # Join original MPC DF with the unique list on CodClasse to get New_ID
-            merged_mpc = df_mpc.merge(unique_classes[['CodClasse', 'New_ID']], on='CodClasse', how='left')
-            # Create Series: Index=Old_ID, Value=New_ID
-            self.mpc_class_map = merged_mpc.set_index('IDClasse')['New_ID']
-
-        # Map for NEO
+            self.mpc_class_map = df_mpc.merge(unique_classes, on='CodClasse', how='left').set_index('IDClasse_x')['New_ID']
         if not df_neo.empty:
-            merged_neo = df_neo.merge(unique_classes[['CodClasse', 'New_ID']], on='CodClasse', how='left')
-            self.neo_class_map = merged_neo.set_index('IDClasse')['New_ID']
+            self.neo_class_map = df_neo.merge(unique_classes, on='CodClasse', how='left').set_index('IDClasse_x')['New_ID']
 
-        # 6. Save Final Classes Table
-        # Structure: IDClasse, Descricao, CodClasse
         out_df = unique_classes[['New_ID', 'Descricao', 'CodClasse']].rename(columns={'New_ID': 'IDClasse'})
         self._save(out_df, FILES['classes'])
-        print(f"Merged Classes saved. Total count: {len(out_df)}")
+        print(f"  Saved {len(out_df)} classes.")
 
     def merge_asteroids(self):
-        print("Merging Asteroids tables...")
+        print("Merging Asteroids...")
+        df_mpc = self._read_csv(DIR_MPC, INPUT_MAP_MPC['asteroids'])
+        df_neo = self._read_csv(DIR_NEO, INPUT_MAP_NEO['asteroids'])
 
-        path_mpc = os.path.join(DIR_MPC, INPUT_MAP_MPC['asteroids'])
-        path_neo = os.path.join(DIR_NEO, INPUT_MAP_NEO['asteroids'])
-
-        if not os.path.exists(path_mpc):
-            raise FileNotFoundError(f"Missing {path_mpc}")
-
-        # low_memory=False speeds up reading by using larger blocks
-        df_mpc = pd.read_csv(path_mpc, dtype=str, low_memory=False)
-
-        if os.path.exists(path_neo):
-            df_neo = pd.read_csv(path_neo, dtype=str, low_memory=False)
-        else:
-            df_neo = pd.DataFrame(columns=df_mpc.columns)
-
-        # Vectorized Key Generation
+        # Keys
         df_mpc['match_key'] = self._create_match_key(df_mpc)
         df_neo['match_key'] = self._create_match_key(df_neo)
 
-        # Vectorized Filtering
-        df_mpc = df_mpc[df_mpc['match_key'] != "NAM_"]
-        df_neo = df_neo[df_neo['match_key'] != "NAM_"]
+        # Filter unnamed
+        df_mpc = df_mpc[df_mpc['match_key'] != "NAM_"].set_index('match_key')
+        df_neo = df_neo[df_neo['match_key'] != "NAM_"].set_index('match_key')
 
-        # Set Index for fast alignment in combine_first (C-level optimization)
-        df_mpc = df_mpc.set_index('match_key')
-        df_neo = df_neo.set_index('match_key')
+        print(f"  MPC: {len(df_mpc)}, NEO: {len(df_neo)}")
 
-        print(f"MPC Unique Records: {len(df_mpc)}")
-        print(f"NEO Unique Records: {len(df_neo)}")
-
-        # combine_first aligns indices and fills gaps without looping
-        df_merged = df_mpc.combine_first(df_neo)
-
-        df_merged = df_merged.reset_index()
-
-        # Vectorized Sequential ID Generation
+        # Combine First (fills nulls in MPC with values from NEO)
+        df_merged = df_mpc.combine_first(df_neo).reset_index()
         df_merged['New_IDAsteroide'] = np.arange(1, len(df_merged) + 1).astype(str)
 
-        # --- Build ID Maps (Optimized) ---
-        # Create a reference Series: match_key -> New_ID
-        key_to_new_id = df_merged.set_index('match_key')['New_IDAsteroide']
+        # Map creation
+        key_map = df_merged.set_index('match_key')['New_IDAsteroide']
 
-        print("Building ID maps...")
-        # Map back to MPC Old IDs using vectorized index lookup
-        mpc_keys = df_mpc.reset_index()[['IDAsteroide', 'match_key']]
-        mpc_keys['New_ID'] = mpc_keys['match_key'].map(key_to_new_id)
-        # Store as Series (Index=Old_ID, Value=New_ID) for fast .map() later
-        self.mpc_id_map = mpc_keys.set_index('IDAsteroide')['New_ID']
+        self.mpc_id_map = df_mpc.reset_index()[['IDAsteroide', 'match_key']].copy()
+        self.mpc_id_map['New_ID'] = self.mpc_id_map['match_key'].map(key_map)
+        self.mpc_id_map = self.mpc_id_map.set_index('IDAsteroide')['New_ID']
 
-        # Map back to NEO Old IDs
-        neo_keys = df_neo.reset_index()[['IDAsteroide', 'match_key']]
-        neo_keys['New_ID'] = neo_keys['match_key'].map(key_to_new_id)
-        self.neo_id_map = neo_keys.set_index('IDAsteroide')['New_ID']
+        self.neo_id_map = df_neo.reset_index()[['IDAsteroide', 'match_key']].copy()
+        self.neo_id_map['New_ID'] = self.neo_id_map['match_key'].map(key_map)
+        self.neo_id_map = self.neo_id_map.set_index('IDAsteroide')['New_ID']
 
-        # Finalize
         df_merged['IDAsteroide'] = df_merged['New_IDAsteroide']
-        df_merged.drop(columns=['match_key', 'New_IDAsteroide'], inplace=True)
-
-        self._save(df_merged, FILES['asteroids'])
-        print(f"Merged Asteroids saved. Total count: {len(df_merged)}")
-
-    def _update_ids(self, df, id_map_series, column='IDAsteroide'):
-        """
-        Updates an ID column using vectorized mapping.
-        """
-        if df.empty or id_map_series is None or column not in df.columns:
-            return df
-
-        # map() with a Series uses optimized index lookup
-        # We use fillna() to keep original IDs if they aren't in the map (orphans)
-        df[column] = df[column].map(id_map_series).fillna(df[column])
-        return df
+        self._save(df_merged.drop(columns=['match_key', 'New_IDAsteroide']), FILES['asteroids'])
+        print(f"  Saved {len(df_merged)} merged asteroids.")
 
     def merge_orbits(self):
-        print("Merging Orbits tables...")
-
-        # We need to regenerate IDOrbita to avoid collisions between MPC and NEO
-        current_orbit_id = 1
-
-        # 1. Process MPC Orbits
-        path_mpc = os.path.join(DIR_MPC, INPUT_MAP_MPC['orbits'])
-        df_mpc = pd.read_csv(path_mpc, dtype=str, low_memory=False)
-
-        # Update Asteroid IDs
-        df_mpc = self._update_ids(df_mpc, self.mpc_id_map, 'IDAsteroide')
-
-        # Update Class IDs if map exists
-        if self.mpc_class_map is not None and 'IDClasse' in df_mpc.columns:
-            df_mpc['IDClasse'] = df_mpc['IDClasse'].map(self.mpc_class_map).fillna(df_mpc['IDClasse'])
-
-        # Regenerate IDOrbita for MPC
-        if not df_mpc.empty:
-            count_mpc = len(df_mpc)
-            # Create new IDs
-            new_ids_mpc = np.arange(current_orbit_id, current_orbit_id + count_mpc).astype(str)
-
-            # Create Map: Old IDOrbita -> New IDOrbita
-            # We need to preserve the old ID temporarily to build the map
-            # Assuming IDOrbita exists and is unique per file
-            self.mpc_orbit_map = pd.Series(new_ids_mpc, index=df_mpc['IDOrbita'])
-
-            # Assign new IDs
-            df_mpc['IDOrbita'] = new_ids_mpc
-            current_orbit_id += count_mpc
-        else:
-            self.mpc_orbit_map = None
-
-        # 2. Process NEO Orbits
-        path_neo = os.path.join(DIR_NEO, INPUT_MAP_NEO['orbits'])
-        if os.path.exists(path_neo):
-            df_neo = pd.read_csv(path_neo, dtype=str, low_memory=False)
-
-            # Update Asteroid IDs
-            df_neo = self._update_ids(df_neo, self.neo_id_map, 'IDAsteroide')
-
-            # Update Class IDs if map exists
-            if self.neo_class_map is not None and 'IDClasse' in df_neo.columns:
-                df_neo['IDClasse'] = df_neo['IDClasse'].map(self.neo_class_map).fillna(df_neo['IDClasse'])
-
-            # Regenerate IDOrbita for NEO
-            if not df_neo.empty:
-                count_neo = len(df_neo)
-                new_ids_neo = np.arange(current_orbit_id, current_orbit_id + count_neo).astype(str)
-
-                # Create Map
-                self.neo_orbit_map = pd.Series(new_ids_neo, index=df_neo['IDOrbita'])
-
-                # Assign new IDs
-                df_neo['IDOrbita'] = new_ids_neo
-                current_orbit_id += count_neo
-            else:
-                self.neo_orbit_map = None
-        else:
-            df_neo = pd.DataFrame()
-            self.neo_orbit_map = None
-
-        # Concatenate (Vectorized Append)
-        df_merged = pd.concat([df_mpc, df_neo], ignore_index=True)
-        self._save(df_merged, FILES['orbits'])
-        print(f"Merged Orbits saved. Total count: {len(df_merged)}")
+        print("Merging Orbits...")
+        self._merge_dependent_table('orbits', 'IDOrbita', has_class=True)
 
     def merge_observations(self):
-        print("Merging Observations tables...")
+        print("Merging Observations...")
+        self._merge_dependent_table('observations', 'IDObservacao', has_class=False)
 
-        # 1. Process MPC Observations
-        path_mpc = os.path.join(DIR_MPC, INPUT_MAP_MPC['observations'])
-        df_mpc = pd.read_csv(path_mpc, dtype=str, low_memory=False)
-        print(f"Loaded MPC Observations: {len(df_mpc)}")
+    def _merge_dependent_table(self, table_key, id_col, has_class=False):
+        current_id = 1
+        dfs = []
 
-        # Update IDs using maps
-        df_mpc = self._update_ids(df_mpc, self.mpc_id_map, 'IDAsteroide')
+        # Process MPC
+        df_mpc = self._read_csv(DIR_MPC, INPUT_MAP_MPC[table_key])
+        if not df_mpc.empty:
+            df_mpc['IDAsteroide'] = df_mpc['IDAsteroide'].map(self.mpc_id_map).fillna(df_mpc['IDAsteroide'])
+            if has_class and self.mpc_class_map is not None:
+                df_mpc['IDClasse'] = df_mpc['IDClasse'].map(self.mpc_class_map).fillna(df_mpc['IDClasse'])
 
-        # 2. Process NEO Observations
-        path_neo = os.path.join(DIR_NEO, INPUT_MAP_NEO['observations'])
-        if os.path.exists(path_neo):
-            df_neo = pd.read_csv(path_neo, dtype=str, low_memory=False)
-            print(f"Loaded NEO Observations: {len(df_neo)}")
+            df_mpc[id_col] = np.arange(current_id, current_id + len(df_mpc)).astype(str)
+            current_id += len(df_mpc)
+            dfs.append(df_mpc)
 
-            # Update IDs using maps
-            df_neo = self._update_ids(df_neo, self.neo_id_map, 'IDAsteroide')
-        else:
-            df_neo = pd.DataFrame()
+        # Process NEO
+        if table_key in INPUT_MAP_NEO:
+            df_neo = self._read_csv(DIR_NEO, INPUT_MAP_NEO[table_key])
+            if not df_neo.empty:
+                df_neo['IDAsteroide'] = df_neo['IDAsteroide'].map(self.neo_id_map).fillna(df_neo['IDAsteroide'])
+                if has_class and self.neo_class_map is not None:
+                    df_neo['IDClasse'] = df_neo['IDClasse'].map(self.neo_class_map).fillna(df_neo['IDClasse'])
 
-        df_merged = pd.concat([df_mpc, df_neo], ignore_index=True)
+                df_neo[id_col] = np.arange(current_id, current_id + len(df_neo)).astype(str)
+                current_id += len(df_neo)
+                dfs.append(df_neo)
 
-        # Always generate a new, unique, sequential IDObservacao
-        df_merged['IDObservacao'] = np.arange(1, len(df_merged) + 1).astype(str)
-
-        self._save(df_merged, FILES['observations'])
-        print(f"Merged Observations saved. Total count: {len(df_merged)}")
+        if dfs:
+            merged = pd.concat(dfs, ignore_index=True)
+            self._save(merged, FILES[table_key])
+            print(f"  Saved {len(merged)} {table_key}.")
 
     def copy_references(self):
-        print("Copying Reference tables...")
+        print("Copying Reference Tables...")
         for key in ['software', 'astronomers']:
-            src = os.path.join(DIR_MPC, INPUT_MAP_MPC[key])
-            if os.path.exists(src):
-                df = pd.read_csv(src, dtype=str, low_memory=False)
-                df['IDCentro'] = '1'
+            df = self._read_csv(DIR_MPC, INPUT_MAP_MPC[key])
+            if not df.empty:
+                df['IDCentro'] = '1' # Default center
                 self._save(df, FILES[key])
 
-    def _save(self, df, filename):
-        path = os.path.join(OUTPUT_DIR, filename)
-        if not os.path.exists(OUTPUT_DIR):
-            os.makedirs(OUTPUT_DIR)
-        df.to_csv(path, index=False, na_rep='')
+    def _read_csv(self, folder, filename, cols=None):
+        path = os.path.join(folder, filename)
+        if os.path.exists(path):
+            df = pd.read_csv(path, dtype=str, low_memory=False)
+            if cols and df.empty: return pd.DataFrame(columns=cols)
+            return df
+        return pd.DataFrame(columns=cols) if cols else pd.DataFrame()
 
     def run(self):
-        # We must merge classes first to build the ID map for orbits
         self.merge_classes()
         self.merge_asteroids()
         self.merge_orbits()
         self.merge_observations()
         self.copy_references()
-        print("Merge Pipeline Complete!")
