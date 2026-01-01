@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 # --- Database Connection ---
 load_dotenv()
 
-DB_CONNECTION_STRING = os.getenv('SQL_CONNECTION_STRING_TEST')
+DB_CONNECTION_STRING = os.getenv('SQL_CONNECTION_STRING')
 
 # --- Input Configuration ---
 # Directory containing the merged CSV files
