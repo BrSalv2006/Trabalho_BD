@@ -89,6 +89,9 @@ class AsteroidProcessor:
         self.output_dir = output_dir
         self.next_asteroid_id = 1
 
+        # Observation ID counter
+        self.next_observation_id = 1
+
         # Class Map (Code -> ID)
         self.class_map: Dict[str, int] = {}
         # Description Map (Code -> Description)
@@ -160,6 +163,10 @@ class AsteroidProcessor:
                             chunk = future.result()
                             if chunk is None or chunk.empty: return
 
+                            # --- FIX: Reset index to ensure alignment with output dataframes ---
+                            chunk.reset_index(drop=True, inplace=True)
+                            # -----------------------------------------------------------------
+
                             chunk_len = len(chunk)
                             chunk['IDAsteroide'] = range(self.next_asteroid_id, self.next_asteroid_id + chunk_len)
                             self.next_asteroid_id += chunk_len
@@ -219,13 +226,13 @@ class AsteroidProcessor:
         df_ast['pdes'] = chunk['pdes_clean']
         df_ast['name'] = chunk['name_clean']
         df_ast['prefix'] = chunk['prefix_clean']
+        df_ast['neo'] = chunk['neo_flag']
+        df_ast['pha'] = chunk['pha_flag']
         df_ast['H'] = chunk['h'].fillna("")
         df_ast['G'] = ""
         df_ast['diameter'] = chunk['diameter'].fillna("")
         df_ast['diameter_sigma'] = chunk['diameter_sigma'].fillna("")
         df_ast['albedo'] = chunk['albedo'].fillna("")
-        df_ast['neo'] = chunk['neo_flag']
-        df_ast['pha'] = chunk['pha_flag']
 
         df_ast.to_csv(self.file_handles['neo_asteroids.csv'], mode='a', header=False, index=False)
 
@@ -277,11 +284,14 @@ class AsteroidProcessor:
 
         # neo_observations.csv
         df_obs = pd.DataFrame()
+        n_obs = len(chunk)
+        df_obs['IDObservacao'] = range(self.next_observation_id, self.next_observation_id + n_obs)
+        self.next_observation_id += n_obs
         df_obs['IDAsteroide'] = chunk['IDAsteroide']
         df_obs['IDAstronomo'] = ""
         df_obs['IDSoftware'] = ""
-        df_obs['Data_atualizacao'] = chunk['epoch_iso']
         df_obs['IDEquipamento'] = ""
+        df_obs['Data_atualizacao'] = chunk['epoch_iso']
         df_obs['Hora'] = ""
         df_obs['Duracao'] = ""
         df_obs['Modo'] = ""

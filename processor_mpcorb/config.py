@@ -84,15 +84,15 @@ CENTURY_PREFIX_MAP = {'I': '18', 'J': '19', 'K': '20'}
 # --- Table Schemas ---
 SCHEMAS = {
     'mpcorb_asteroids.csv': [
-        'IDAsteroide', 'number', 'spkid', 'pdes', 'name', 'prefix', 'H', 'G',
-        'diameter', 'diameter_sigma', 'albedo', 'neo', 'pha'
+        'IDAsteroide', 'number', 'spkid', 'pdes', 'name', 'prefix', 'neo', 'pha', 'H', 'G',
+        'diameter', 'diameter_sigma', 'albedo'
     ],
     'mpcorb_astronomers.csv': [
         'IDAstronomo', 'Nome', 'IDCentro'
     ],
     'mpcorb_observations.csv': [
-        'IDAsteroide', 'IDAstronomo', 'IDSoftware', 'Data_atualizacao',
-        'IDEquipamento', 'Hora', 'Duracao', 'Modo'
+        'IDObservacao', 'IDAsteroide', 'IDAstronomo', 'IDSoftware', 'IDEquipamento',
+        'Data_atualizacao', 'Hora', 'Duracao', 'Modo'
     ],
     'mpcorb_orbits.csv': [
         'IDAsteroide', 'epoch', 'e', 'a', 'i', 'om', 'w', 'ma', 'n', 'tp',

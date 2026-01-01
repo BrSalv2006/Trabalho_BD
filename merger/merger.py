@@ -154,7 +154,10 @@ class DataMerger:
         if df.empty: return df
         # map() with a Series uses optimized index lookup
         df['IDAsteroide'] = df['IDAsteroide'].map(id_map_series)
-        return df.dropna(subset=['IDAsteroide'])
+        # We removed .dropna() so that observations without a linked asteroid
+        # (orphans) are preserved with IDAsteroide as NaN/Empty,
+        # instead of being deleted.
+        return df
 
     def merge_orbits(self):
         print("Merging Orbits tables...")
@@ -193,17 +196,25 @@ class DataMerger:
 
         path_mpc = os.path.join(DIR_MPC, INPUT_MAP_MPC['observations'])
         df_mpc = pd.read_csv(path_mpc, dtype=str, low_memory=False)
+        print(f"Loaded MPC Observations: {len(df_mpc)}")
         df_mpc = self._update_ids(df_mpc, self.mpc_id_map)
 
         path_neo = os.path.join(DIR_NEO, INPUT_MAP_NEO['observations'])
         if os.path.exists(path_neo):
             df_neo = pd.read_csv(path_neo, dtype=str, low_memory=False)
+            print(f"Loaded NEO Observations: {len(df_neo)}")
             df_neo = self._update_ids(df_neo, self.neo_id_map)
         else:
             df_neo = pd.DataFrame()
 
         df_merged = pd.concat([df_mpc, df_neo], ignore_index=True)
+
+        # Always generate a new, unique, sequential IDObservacao
+        # This handles cases where input IDs collide or are missing
+        df_merged['IDObservacao'] = np.arange(1, len(df_merged) + 1).astype(str)
+
         self._save(df_merged, FILES['observations'])
+        print(f"Merged Observations saved. Total count: {len(df_merged)}")
 
     def copy_references(self):
         print("Copying Reference tables...")
@@ -211,6 +222,7 @@ class DataMerger:
             src = os.path.join(DIR_MPC, INPUT_MAP_MPC[key])
             if os.path.exists(src):
                 df = pd.read_csv(src, dtype=str, low_memory=False)
+                df['IDCentro'] = '1'
                 self._save(df, FILES[key])
 
     def _save(self, df, filename):

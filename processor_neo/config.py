@@ -71,12 +71,12 @@ NEO_DTYPES = {
 # --- Table Schemas ---
 SCHEMAS = {
     'neo_asteroids.csv': [
-        'IDAsteroide', 'number', 'spkid', 'pdes', 'name', 'prefix', 'H', 'G',
-        'diameter', 'diameter_sigma', 'albedo', 'neo', 'pha'
+        'IDAsteroide', 'number', 'spkid', 'pdes', 'name', 'prefix', 'neo', 'pha', 'H', 'G',
+        'diameter', 'diameter_sigma', 'albedo'
     ],
     'neo_observations.csv': [
-        'IDAsteroide', 'IDAstronomo', 'IDSoftware', 'Data_atualizacao',
-        'IDEquipamento', 'Hora', 'Duracao', 'Modo'
+        'IDObservacao', 'IDAsteroide', 'IDAstronomo', 'IDEquipamento', 'IDSoftware',
+        'Data_atualizacao', 'Hora', 'Duracao', 'Modo'
     ],
     'neo_orbits.csv': [
         'IDAsteroide', 'epoch', 'e', 'a', 'i', 'om', 'w', 'ma', 'n', 'tp',

@@ -11,7 +11,7 @@ DB_CONNECTION_STRING = os.getenv('SQL_CONNECTION_STRING_TEST')
 INPUT_DIR = 'final_dataset'
 
 # Number of rows to insert per transaction
-BATCH_SIZE = 10000
+BATCH_SIZE = 100000
 
 # --- Table Mapping ---
 # Maps the CSV filename to the destination Table Name in the database.

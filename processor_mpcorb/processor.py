@@ -93,9 +93,6 @@ def process_chunk_worker(chunk: pd.DataFrame) -> pd.DataFrame:
     if fallback_mask.any():
         # Fallback uses manual calc
         fallback_subset = chunk.loc[fallback_mask]
-        # Must grab source string columns if calculate_tp expects strings?
-        # utils.calculate_tp usually expects string/float mix. It's safer to pass the float vals we already have.
-        # But `chunk` has strings. Let's rely on the floats we prepared.
 
         # Zip inputs: epoch string, Mean Anomaly float, Mean Motion float
         ma_subset = ma_float[fallback_mask]
@@ -151,6 +148,9 @@ class AsteroidProcessor:
         # Class Map
         self.class_map: Dict[str, int] = {}
         self.next_class_id = 1
+
+        # Observation ID counter
+        self.next_observation_id = 1
 
         self.next_asteroid_id = 1
         self.file_handles = {}
@@ -256,6 +256,13 @@ class AsteroidProcessor:
                             chunk = chunk[is_new].copy()
                             if chunk.empty:
                                 return
+
+                            # --- FIX: Reset index to ensure alignment with output dataframes ---
+                            # This fixes the issue where subsequent chunks have mismatched indices
+                            # causing NaNs in IDAsteroide/IDSoftware/IDAstronomo
+                            chunk.reset_index(drop=True, inplace=True)
+                            # -----------------------------------------------------------------
+
                             self.seen_ids.update(chunk['obj_id'])
 
                             chunk_len = len(chunk)
@@ -332,22 +339,25 @@ class AsteroidProcessor:
         df_ast['pdes'] = chunk['pdes_parsed']
         df_ast['name'] = chunk['name_parsed']
         df_ast['prefix'] = ""
+        df_ast['neo'] = chunk['is_neo_flag']
+        df_ast['pha'] = chunk['is_pha_flag']
         df_ast['H'] = chunk['abs_mag'].fillna("")
         df_ast['G'] = chunk['slope_param'].fillna("")
         df_ast['diameter'] = ""
         df_ast['diameter_sigma'] = ""
         df_ast['albedo'] = ""
-        df_ast['neo'] = chunk['is_neo_flag']
-        df_ast['pha'] = chunk['is_pha_flag']
         df_ast.to_csv(self.file_handles['mpcorb_asteroids.csv'], mode='a', header=False, index=False)
 
         # mpcorb_observations.csv
         df_obs = pd.DataFrame()
+        n_obs = len(chunk)
+        df_obs['IDObservacao'] = range(self.next_observation_id, self.next_observation_id + n_obs)
+        self.next_observation_id += n_obs
         df_obs['IDAsteroide'] = chunk['IDAsteroide']
         df_obs['IDAstronomo'] = chunk['id_astro']
         df_obs['IDSoftware'] = chunk['id_soft']
-        df_obs['Data_atualizacao'] = chunk['epoch_iso']
         df_obs['IDEquipamento'] = ""
+        df_obs['Data_atualizacao'] = chunk['epoch_iso']
         df_obs['Hora'] = ""
         df_obs['Duracao'] = ""
         df_obs['Modo'] = "Orbit Computation"
