@@ -37,7 +37,8 @@ IMPORT_ORDER = [
 
 # --- Identity Tables ---
 # Tables that have an IDENTITY column where we need to insert explicit IDs from the CSV.
-IDENTITY_TABLES = {'Classe', 'Software', 'Astronomo', 'Asteroide'}
+# Added 'Orbita' and 'Observacao' to ensure IDs match the CSVs.
+IDENTITY_TABLES = {'Classe', 'Software', 'Astronomo', 'Asteroide', 'Orbita', 'Observacao'}
 
 # --- String Limits (Truncation) ---
 STRING_LIMITS = {

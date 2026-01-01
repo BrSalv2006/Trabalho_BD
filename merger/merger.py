@@ -166,9 +166,6 @@ class DataMerger:
 	def merge_orbits(self):
 		print("Merging Orbits tables...")
 
-		# We need to regenerate IDOrbita to avoid collisions between MPC and NEO
-		current_orbit_id = 1
-
 		# 1. Process MPC Orbits
 		path_mpc = os.path.join(DIR_MPC, INPUT_MAP_MPC['orbits'])
 		df_mpc = pd.read_csv(path_mpc, dtype=str, low_memory=False)
@@ -179,23 +176,6 @@ class DataMerger:
 		# Update Class IDs if map exists
 		if self.mpc_class_map is not None and 'IDClasse' in df_mpc.columns:
 			df_mpc['IDClasse'] = df_mpc['IDClasse'].map(self.mpc_class_map).fillna(df_mpc['IDClasse'])
-
-		# Regenerate IDOrbita for MPC
-		if not df_mpc.empty:
-			count_mpc = len(df_mpc)
-			# Create new IDs
-			new_ids_mpc = np.arange(current_orbit_id, current_orbit_id + count_mpc).astype(str)
-
-			# Create Map: Old IDOrbita -> New IDOrbita
-			# We need to preserve the old ID temporarily to build the map
-			# Assuming IDOrbita exists and is unique per file
-			self.mpc_orbit_map = pd.Series(new_ids_mpc, index=df_mpc['IDOrbita'])
-
-			# Assign new IDs
-			df_mpc['IDOrbita'] = new_ids_mpc
-			current_orbit_id += count_mpc
-		else:
-			self.mpc_orbit_map = None
 
 		# 2. Process NEO Orbits
 		path_neo = os.path.join(DIR_NEO, INPUT_MAP_NEO['orbits'])
@@ -208,26 +188,37 @@ class DataMerger:
 			# Update Class IDs if map exists
 			if self.neo_class_map is not None and 'IDClasse' in df_neo.columns:
 				df_neo['IDClasse'] = df_neo['IDClasse'].map(self.neo_class_map).fillna(df_neo['IDClasse'])
-
-			# Regenerate IDOrbita for NEO
-			if not df_neo.empty:
-				count_neo = len(df_neo)
-				new_ids_neo = np.arange(current_orbit_id, current_orbit_id + count_neo).astype(str)
-
-				# Create Map
-				self.neo_orbit_map = pd.Series(new_ids_neo, index=df_neo['IDOrbita'])
-
-				# Assign new IDs
-				df_neo['IDOrbita'] = new_ids_neo
-				current_orbit_id += count_neo
-			else:
-				self.neo_orbit_map = None
 		else:
 			df_neo = pd.DataFrame()
-			self.neo_orbit_map = None
 
-		# Concatenate (Vectorized Append)
+		# 3. Concatenate
+		# We drop the original IDOrbita as we will regenerate it
+		if 'IDOrbita' in df_mpc.columns:
+			df_mpc = df_mpc.drop(columns=['IDOrbita'])
+		if 'IDOrbita' in df_neo.columns:
+			df_neo = df_neo.drop(columns=['IDOrbita'])
+
 		df_merged = pd.concat([df_mpc, df_neo], ignore_index=True)
+
+		# 4. Deduplicate / Merge
+		# Group by IDAsteroide and epoch, taking the first non-null value for each column
+		# This merges complementary data
+		print(f"Rows before deduplication: {len(df_merged)}")
+
+		if not df_merged.empty:
+			# groupby().first() takes the first non-null value
+			df_merged = df_merged.groupby(['IDAsteroide', 'epoch'], as_index=False).first()
+
+		print(f"Rows after deduplication: {len(df_merged)}")
+
+		# 5. Generate New IDOrbita
+		if not df_merged.empty:
+			df_merged['IDOrbita'] = np.arange(1, len(df_merged) + 1).astype(str)
+
+			# Reorder columns to put IDOrbita first
+			cols = ['IDOrbita'] + [c for c in df_merged.columns if c != 'IDOrbita']
+			df_merged = df_merged[cols]
+
 		self._save(df_merged, FILES['orbits'])
 		print(f"Merged Orbits saved. Total count: {len(df_merged)}")
 
