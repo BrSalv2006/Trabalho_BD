@@ -16,23 +16,23 @@ BATCH_SIZE = 100000
 # --- Table Mapping ---
 # Maps the CSV filename to the destination Table Name in the database.
 TABLE_MAPPINGS = {
-    'classes.csv': 'Classe',
-    'software.csv': 'Software',
-    'astronomers.csv': 'Astronomo',
-    'asteroids.csv': 'Asteroide',
-    'observations.csv': 'Observacao',
-    'orbits.csv': 'Orbita'
+	'classes.csv': 'Classe',
+	'software.csv': 'Software',
+	'astronomers.csv': 'Astronomo',
+	'asteroids.csv': 'Asteroide',
+	'observations.csv': 'Observacao',
+	'orbits.csv': 'Orbita'
 }
 
 # --- Import Order ---
 # Critical for Foreign Key constraints.
 IMPORT_ORDER = [
-    'classes.csv',      # Independent
-    'software.csv',     # Independent
-    'astronomers.csv',  # Independent
-    'asteroids.csv',    # Independent
-    'observations.csv', # Depends on Asteroid, Software, Astronomer
-    'orbits.csv'        # Depends on Asteroid, Classe
+	'classes.csv',      # Independent
+	'software.csv',     # Independent
+	'astronomers.csv',  # Independent
+	'asteroids.csv',    # Independent
+	'observations.csv', # Depends on Asteroid, Software, Astronomer
+	'orbits.csv'        # Depends on Asteroid, Classe
 ]
 
 # --- Identity Tables ---
@@ -41,32 +41,32 @@ IDENTITY_TABLES = {'Classe', 'Software', 'Astronomo', 'Asteroide'}
 
 # --- String Limits (Truncation) ---
 STRING_LIMITS = {
-    'Asteroide': {
-        'spkid': 20,
-        'pdes': 20,
-        'name': 100,
-        'prefix': 10
-    },
-    'Orbita': {
-        'uncertainty': 10,
-        'Reference': 50,
-        'Arc': 20,
-        'Coarse_Perts': 20,
-        'Precise_Perts': 20,
-        'Hex_Flags': 10
-    },
-    'Software': {
-        'Nome': 100,
-        'Versao': 20
-    },
-    'Astronomo': {
-        'Nome': 100
-    },
-    'Classe': {
-        'CodClasse': 50,
-        'Descricao': 255
-    },
-    'Observacao': {
-        'Modo': 50
-    }
+	'Asteroide': {
+		'spkid': 20,
+		'pdes': 20,
+		'name': 100,
+		'prefix': 10
+	},
+	'Orbita': {
+		'uncertainty': 10,
+		'Reference': 50,
+		'Arc': 20,
+		'Coarse_Perts': 20,
+		'Precise_Perts': 20,
+		'Hex_Flags': 10
+	},
+	'Software': {
+		'Nome': 100,
+		'Versao': 20
+	},
+	'Astronomo': {
+		'Nome': 100
+	},
+	'Classe': {
+		'CodClasse': 50,
+		'Descricao': 255
+	},
+	'Observacao': {
+		'Modo': 50
+	}
 }

@@ -20,27 +20,27 @@ DATE_FORMAT = '%Y-%m-%d %H:%M:%S'
 # --- Pandas Optimization: Dtypes for MPCORB ---
 # Using string instead of float32 to avoid precision loss.
 MPCORB_DTYPES = {
-    'designation': 'string',
-    'epoch': 'string',
-    'hex_flags': 'string',
-    'abs_mag': 'string',
-    'slope_param': 'string',
-    'mean_anomaly': 'string',
-    'arg_perihelion': 'string',
-    'long_asc_node': 'string',
-    'inclination': 'string',
-    'eccentricity': 'string',
-    'mean_motion': 'string',
-    'semi_major_axis': 'string',
-    'uncertainty': 'string',
-    'reference': 'string',
-    'num_observations': 'string',
-    'num_oppositions': 'string',
-    'computer': 'string',
-    'designation_full': 'string',
-    'last_obs_date': 'string',
-    'orbit_type': 'string',
-    'is_neo': 'string'
+	'designation': 'string',
+	'epoch': 'string',
+	'hex_flags': 'string',
+	'abs_mag': 'string',
+	'slope_param': 'string',
+	'mean_anomaly': 'string',
+	'arg_perihelion': 'string',
+	'long_asc_node': 'string',
+	'inclination': 'string',
+	'eccentricity': 'string',
+	'mean_motion': 'string',
+	'semi_major_axis': 'string',
+	'uncertainty': 'string',
+	'reference': 'string',
+	'num_observations': 'string',
+	'num_oppositions': 'string',
+	'computer': 'string',
+	'designation_full': 'string',
+	'last_obs_date': 'string',
+	'orbit_type': 'string',
+	'is_neo': 'string'
 }
 
 # --- MPCORB Parsing Constants ---
@@ -60,16 +60,16 @@ MASK_PHA = 0x8000
 
 # Orbit Types Mapping
 ORBIT_TYPES = {
-    1: 'Atira',
-    2: 'Aten',
-    3: 'Apollo',
-    4: 'Amor',
-    5: 'Object with q < 1.665 AU',
-    6: 'Hungaria',
-    7: 'Phocaea',
-    8: 'Hilda',
-    9: 'Jupiter Trojan',
-    10: 'Distant object'
+	1: 'Atira',
+	2: 'Aten',
+	3: 'Apollo',
+	4: 'Amor',
+	5: 'Object with q < 1.665 AU',
+	6: 'Hungaria',
+	7: 'Phocaea',
+	8: 'Hilda',
+	9: 'Jupiter Trojan',
+	10: 'Distant object'
 }
 
 # Date Unpacking Constants
@@ -83,28 +83,28 @@ CENTURY_PREFIX_MAP = {'I': '18', 'J': '19', 'K': '20'}
 
 # --- Table Schemas ---
 SCHEMAS = {
-    'mpcorb_asteroids.csv': [
-        'IDAsteroide', 'number', 'spkid', 'pdes', 'name', 'prefix', 'neo', 'pha', 'H', 'G',
-        'diameter', 'diameter_sigma', 'albedo'
-    ],
-    'mpcorb_astronomers.csv': [
-        'IDAstronomo', 'Nome', 'IDCentro'
-    ],
-    'mpcorb_observations.csv': [
-        'IDObservacao', 'IDAsteroide', 'IDAstronomo', 'IDSoftware', 'IDEquipamento',
-        'Data_atualizacao', 'Hora', 'Duracao', 'Modo'
-    ],
-    'mpcorb_orbits.csv': [
-        'IDOrbita', 'IDAsteroide', 'epoch', 'e', 'sigma_e', 'a', 'sigma_a', 'q', 'sigma_q',
-        'i', 'sigma_i', 'om', 'sigma_om','w', 'sigma_w', 'ma', 'sigma_ma','ad','sigma_ad',
-        'n', 'sigma_n', 'tp', 'sigma_tp', 'per', 'sigma_per', 'moid', 'moid_ld','rms', 'uncertainty',
-        'Reference', 'Num_Obs', 'Num_Opp', 'Arc', 'Coarse_Perts', 'Precise_Perts',
-        'Hex_Flags', 'Is1kmNEO', 'IsCriticalList', 'IsOneOppositionEarlier', 'IDClasse'
-    ],
-    'mpcorb_software.csv': [
-        'IDSoftware', 'Nome', 'Versao'
-    ],
-    'mpcorb_classes.csv': [
-        'IDClasse', 'Descricao', 'CodClasse'
-    ]
+	'mpcorb_asteroids.csv': [
+		'IDAsteroide', 'number', 'spkid', 'pdes', 'name', 'prefix', 'neo', 'pha', 'H', 'G',
+		'diameter', 'diameter_sigma', 'albedo'
+	],
+	'mpcorb_astronomers.csv': [
+		'IDAstronomo', 'Nome', 'IDCentro'
+	],
+	'mpcorb_observations.csv': [
+		'IDObservacao', 'IDAsteroide', 'IDAstronomo', 'IDSoftware', 'IDEquipamento',
+		'Data_atualizacao', 'Hora', 'Duracao', 'Modo'
+	],
+	'mpcorb_orbits.csv': [
+		'IDOrbita', 'IDAsteroide', 'epoch', 'e', 'sigma_e', 'a', 'sigma_a', 'q', 'sigma_q',
+		'i', 'sigma_i', 'om', 'sigma_om','w', 'sigma_w', 'ma', 'sigma_ma','ad','sigma_ad',
+		'n', 'sigma_n', 'tp', 'sigma_tp', 'per', 'sigma_per', 'moid', 'moid_ld','rms', 'uncertainty',
+		'Reference', 'Num_Obs', 'Num_Opp', 'Arc', 'Coarse_Perts', 'Precise_Perts',
+		'Hex_Flags', 'Is1kmNEO', 'IsCriticalList', 'IsOneOppositionEarlier', 'IDClasse'
+	],
+	'mpcorb_software.csv': [
+		'IDSoftware', 'Nome', 'Versao'
+	],
+	'mpcorb_classes.csv': [
+		'IDClasse', 'Descricao', 'CodClasse'
+	]
 }
