@@ -1,112 +1,98 @@
 import os
 import time
 import mssql_python
-# Removed pandas/numpy as we are now doing direct BULK INSERT without preprocessing
+from typing import Optional
 from .config import (
-	DB_CONNECTION_STRING, INPUT_DIR, BATCH_SIZE,
-	TABLE_MAPPINGS, IMPORT_ORDER, IDENTITY_TABLES, STRING_LIMITS
+    DB_CONNECTION_STRING, INPUT_DIR,
+    TABLE_MAPPINGS, IMPORT_ORDER, IDENTITY_TABLES
 )
 
 class DBImporter:
-	def __init__(self):
-		print(f"Initializing Database connection (mssql_python)...")
-		# Test connection
-		try:
-			with mssql_python.connect(DB_CONNECTION_STRING) as conn:
-				print(f"Connected successfully to the database.")
-		except Exception as e:
-			print(f"Connection failed: {e}")
-			raise e
+    def __init__(self):
+        print(f"Initializing Database connection...")
+        self.validate_connection()
 
-	def _get_connection(self):
-		return mssql_python.connect(DB_CONNECTION_STRING)
+    def validate_connection(self):
+        try:
+            with mssql_python.connect(DB_CONNECTION_STRING) as conn:
+                print(f"Connected successfully to database.")
+        except Exception as e:
+            print(f"Connection failed: {e}")
+            raise
 
-	def _create_default_observation_center(self):
-		"""
-		TEMPORARY: Creates a default observation center (ID 1) for testing.
-		"""
-		print("\n--- Creating Default Observation Center (Temporary) ---")
-		try:
-			with self._get_connection() as conn:
-				with conn.cursor() as cursor:
-					cursor.execute("SELECT COUNT(*) FROM Centro_de_observacao WHERE IDCentro = 1")
-					result = cursor.fetchone()[0]
+    def _get_connection(self):
+        return mssql_python.connect(DB_CONNECTION_STRING)
 
-					if result == 0:
-						cursor.execute("SET IDENTITY_INSERT Centro_de_observacao ON")
-						cursor.execute(
-							"INSERT INTO Centro_de_observacao (IDCentro, Nome, Localizacao) "
-							"VALUES (1, 'Default Test Center', 'Earth')"
-						)
-						cursor.execute("SET IDENTITY_INSERT Centro_de_observacao OFF")
-						conn.commit()
-						print("Created default center: ID 1 - Default Test Center")
-					else:
-						print("Default center ID 1 already exists.")
-		except Exception as e:
-			print(f"[ERROR] Could not create default center: {e}")
-			raise e
+    def _create_default_observation_center(self):
+        """Creates a default observation center (ID 1) if missing."""
+        print("\n--- Checking Default Observation Center ---")
+        try:
+            with self._get_connection() as conn:
+                with conn.cursor() as cursor:
+                    cursor.execute("SELECT COUNT(*) FROM Centro_de_observacao WHERE IDCentro = 1")
+                    result = cursor.fetchone()[0]
 
-	def import_file(self, filename, table_name):
-		# BULK INSERT requires an absolute path to the file
-		filepath = os.path.abspath(os.path.join(INPUT_DIR, filename))
+                    if result == 0:
+                        cursor.execute("SET IDENTITY_INSERT Centro_de_observacao ON")
+                        cursor.execute(
+                            "INSERT INTO Centro_de_observacao (IDCentro, Nome, Localizacao) "
+                            "VALUES (1, 'Default Test Center', 'Earth')"
+                        )
+                        cursor.execute("SET IDENTITY_INSERT Centro_de_observacao OFF")
+                        conn.commit()
+                        print("Created default center: ID 1")
+                    else:
+                        print("Default center exists.")
+        except Exception as e:
+            print(f"[ERROR] Could not create default center: {e}")
+            raise
 
-		if not os.path.exists(filepath):
-			print(f"Skipping {filename}: File not found in {INPUT_DIR}.")
-			return
+    def import_file(self, filename: str, table_name: str):
+        filepath = os.path.abspath(os.path.join(INPUT_DIR, filename))
 
-		print(f"\n--- Bulk Importing {filename} -> {table_name} ---")
+        if not os.path.exists(filepath):
+            print(f"Skipping {filename}: File not found in {INPUT_DIR}.")
+            return
 
-		start_time = time.time()
+        print(f"\n--- Importing {filename} -> {table_name} ---")
+        start_time = time.time()
 
-		try:
-			with self._get_connection() as conn:
-				with conn.cursor() as cursor:
-					is_identity_table = table_name in IDENTITY_TABLES
+        try:
+            with self._get_connection() as conn:
+                with conn.cursor() as cursor:
+                    # Configure BULK INSERT options
+                    options = [
+                        "FIELDTERMINATOR = ','",
+                        "ROWTERMINATOR = '\\n'",
+                        "FIRSTROW = 2",
+                        "TABLOCK"
+                    ]
+                    if table_name in IDENTITY_TABLES:
+                        options.append("KEEPIDENTITY")
 
-					# Construct BULK INSERT options
-					with_options = [
-						"FIELDTERMINATOR = ','",
-						"ROWTERMINATOR = '\\n'",
-						"FIRSTROW = 2",
-						"TABLOCK"
-					]
+                    sql = f"BULK INSERT {table_name} FROM '{filepath}' WITH ({', '.join(options)})"
 
-					if is_identity_table:
-						with_options.append("KEEPIDENTITY")
+                    print(f"Executing BULK INSERT...")
+                    cursor.execute(sql)
+                    conn.commit()
 
-					sql = f"""
-						BULK INSERT {table_name}
-						FROM '{filepath}'
-						WITH ({', '.join(with_options)})
-					"""
+        except Exception as e:
+            print(f"\n[ERROR] Failed to import {filename}.")
+            if "Operating system error code 5" in str(e):
+                print(f"Permission Denied: SQL Server cannot read '{filepath}'. Check service account permissions.")
+            else:
+                print(f"Details: {e}")
+            return
 
-					print(f"Executing BULK INSERT for {table_name}...")
-					cursor.execute(sql)
-					conn.commit()
+        print(f"Completed {table_name} in {time.time() - start_time:.2f} seconds.")
 
-		except Exception as e:
-			print(f"\n[ERROR] Failed to import {filename}.")
-			# Fallback error message if it's a permission issue (Error 5)
-			if "Operating system error code 5" in str(e):
-				print(f"[ERROR] Permission Denied: SQL Server cannot access the file.")
-				print(f"Path: {filepath}")
-				print("Ensure the SQL Server service account has read permissions for this folder.")
-			else:
-				print(f"Details: {e}")
-			return
+    def run(self):
+        self._create_default_observation_center()
 
-		duration = time.time() - start_time
-		print(f"Completed {table_name} in {duration:.2f} seconds.")
+        for filename in IMPORT_ORDER:
+            if filename in TABLE_MAPPINGS:
+                self.import_file(filename, TABLE_MAPPINGS[filename])
+            else:
+                print(f"Warning: No mapping for {filename}")
 
-	def run(self):
-		self._create_default_observation_center()
-
-		for filename in IMPORT_ORDER:
-			if filename in TABLE_MAPPINGS:
-				table_name = TABLE_MAPPINGS[filename]
-				self.import_file(filename, table_name)
-			else:
-				print(f"Warning: No table mapping defined for {filename}")
-
-		print("\nAll imports finished.")
+        print("\nAll imports finished.")
