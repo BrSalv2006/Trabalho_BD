@@ -1,7 +1,7 @@
 import os
 import time
 from merger import DataMerger
-from merger.config import OUTPUT_DIR
+from config import OUTPUT_DIR
 
 def main():
     print("=== Data Merge Pipeline ===")

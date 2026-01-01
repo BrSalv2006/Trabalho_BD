@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 import numpy as np
-from merger.config import DIR_MPC, DIR_NEO, OUTPUT_DIR, FILES, INPUT_MAP_MPC, INPUT_MAP_NEO
+from config import DIR_MPC, DIR_NEO, OUTPUT_DIR, FILES, INPUT_MAP_MPC, INPUT_MAP_NEO
 
 class DataMerger:
     def __init__(self):

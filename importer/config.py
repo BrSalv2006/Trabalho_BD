@@ -2,13 +2,9 @@ import os
 from dotenv import load_dotenv
 
 # --- Database Connection ---
-# Default connection string for MSSQL using ODBC Driver 17.
-# Format: mssql+pyodbc://username:password@host/database?driver=ODBC+Driver+17+for+SQL+Server
 load_dotenv()
 
-DB_CONNECTION_STRING = os.getenv(
-    'SQL_CONNECTION_STRING_TEST2'
-)
+DB_CONNECTION_STRING = os.getenv('SQL_CONNECTION_STRING_TEST')
 
 # --- Input Configuration ---
 # Directory containing the merged CSV files
@@ -30,12 +26,11 @@ TABLE_MAPPINGS = {
 
 # --- Import Order ---
 # Critical for Foreign Key constraints.
-# Reference tables must be loaded before Dependent tables.
 IMPORT_ORDER = [
     'classes.csv',      # Independent
     'software.csv',     # Independent
-    'astronomers.csv',  # Independent (references Centro, but we assume those exist or are nullable/handled)
-    'asteroids.csv',    # Independent (mostly)
+    'astronomers.csv',  # Independent
+    'asteroids.csv',    # Independent
     'observations.csv', # Depends on Asteroid, Software, Astronomer
     'orbits.csv'        # Depends on Asteroid, Classe
 ]
@@ -45,7 +40,6 @@ IMPORT_ORDER = [
 IDENTITY_TABLES = {'Classe', 'Software', 'Astronomo', 'Asteroide'}
 
 # --- String Limits (Truncation) ---
-# Enforce VARCHAR limits to prevent "String data, right truncation" errors.
 STRING_LIMITS = {
     'Asteroide': {
         'spkid': 20,

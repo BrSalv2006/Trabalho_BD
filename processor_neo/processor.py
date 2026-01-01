@@ -5,8 +5,8 @@ import numpy as np
 from concurrent.futures import ProcessPoolExecutor
 from typing import Dict
 
-from processor_neo.config import SCHEMAS, INPUT_FILE, CHUNK_SIZE, NEO_DTYPES
-from processor_neo.utils import ensure_directory
+from config import SCHEMAS, INPUT_FILE, CHUNK_SIZE, NEO_DTYPES
+from utils import ensure_directory
 
 # --- Worker Function ---
 

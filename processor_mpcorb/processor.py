@@ -6,13 +6,13 @@ from typing import Dict, Set
 from concurrent.futures import ProcessPoolExecutor, as_completed
 
 # Import config and utils
-from processor_mpcorb.config import (
+from config import (
     SCHEMAS, INPUT_FILE, CHUNK_SIZE, MPCORB_DTYPES,
     SOFTWARE_PREFIXES, SOFTWARE_SPECIFIC_NAMES,
     MASK_ORBIT_TYPE, ORBIT_TYPES, MASK_NEO, MASK_PHA,
     MASK_1KM_NEO, MASK_CRITICAL_LIST, MASK_1_OPPOSITION
 )
-from processor_mpcorb.utils import ensure_directory, unpack_designation, unpack_packed_date, calculate_tp
+from utils import ensure_directory, unpack_designation, unpack_packed_date, calculate_tp
 
 # --- Worker Function ---
 
