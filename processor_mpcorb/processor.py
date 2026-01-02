@@ -2,16 +2,16 @@ import os
 import time
 import pandas as pd
 import numpy as np
-from typing import Dict, Set, List, Any
+from typing import Dict, Set, Any
 from concurrent.futures import ProcessPoolExecutor
 
-from .config import (
-	SCHEMAS, INPUT_FILE, CHUNK_SIZE, MPCORB_DTYPES,
+from processor_mpcorb.config import (
+	SCHEMAS, CHUNK_SIZE, MPCORB_DTYPES,
 	SOFTWARE_PREFIXES, SOFTWARE_SPECIFIC_NAMES,
 	MASK_ORBIT_TYPE, ORBIT_TYPES, MASK_NEO, MASK_PHA,
 	MASK_1KM_NEO, MASK_CRITICAL_LIST, MASK_1_OPPOSITION
 )
-from .utils import ensure_directory, unpack_designation, unpack_packed_date, calculate_tp, expand_scientific_notation
+from processor_mpcorb.utils import ensure_directory, unpack_designation, unpack_packed_date, calculate_tp, expand_scientific_notation
 
 # --- Worker Function ---
 

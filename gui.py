@@ -1,11 +1,8 @@
 import multiprocessing
 import tkinter as tk
-from tkinter import ttk, scrolledtext, messagebox
-import sys
+from tkinter import ttk, scrolledtext
 import os
 import queue
-import time
-import shutil
 
 # --- WORKER PROCESS (Top-Level) ---
 def run_worker_process(task_name, log_queue, env_vars):
@@ -93,7 +90,7 @@ def run_worker_process(task_name, log_queue, env_vars):
 		elif task_name == "INIT_DB":
 			print("\n[Maintenance] Initializing Database...")
 			set_status("Initializing Database...")
-			import init_db
+			import scripts.init_db as init_db
 			# Patch Connection String if env var is set
 			if 'SQL_CONNECTION_STRING' in os.environ:
 				init_db.DB_CONNECTION_STRING = os.environ.get('SQL_CONNECTION_STRING')

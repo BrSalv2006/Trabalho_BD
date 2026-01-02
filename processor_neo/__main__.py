@@ -1,7 +1,7 @@
 import os
 import sys
-from .config import INPUT_FILE, OUTPUT_DIR
-from .processor import AsteroidProcessor
+from processor_neo.config import INPUT_FILE, OUTPUT_DIR
+from processor_neo.processor import AsteroidProcessor
 
 def main():
 	print("=== NEO Data Processor ===")

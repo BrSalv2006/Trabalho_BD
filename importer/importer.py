@@ -1,8 +1,7 @@
 import os
 import time
 import mssql_python
-from typing import Optional
-from .config import (
+from importer.config import (
 	DB_CONNECTION_STRING, INPUT_DIR,
 	TABLE_MAPPINGS, IMPORT_ORDER, IDENTITY_TABLES
 )
