@@ -3,6 +3,11 @@ import time
 import os
 import sys
 
+# Ensure we can import modules from the script's directory
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+if BASE_DIR not in sys.path:
+	sys.path.insert(0, BASE_DIR)
+
 # --- Import Processors ---
 try:
 	from processor_mpcorb import config as MPCProcessorConfig, processor as MPCProcessor

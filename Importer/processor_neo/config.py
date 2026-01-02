@@ -10,8 +10,11 @@ import csv
 csv.field_size_limit(sys.maxsize)
 
 # --- File Paths ---
-INPUT_FILE = os.path.join('DATASETS', 'neo.csv')
-OUTPUT_DIR = 'output_tables_neo'
+# Determine the project root directory (2 levels up from this file)
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+INPUT_FILE = os.path.join(BASE_DIR, 'DATASETS', 'neo.csv')
+OUTPUT_DIR = os.path.join(BASE_DIR, 'output_tables_neo')
 
 # --- Processing Config ---
 CHUNK_SIZE = 100000

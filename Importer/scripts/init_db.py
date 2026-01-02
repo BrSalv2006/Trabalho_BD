@@ -4,8 +4,11 @@ import sys
 from dotenv import load_dotenv
 import mssql_python
 
+# Determine the project root directory (2 levels up from this file)
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 # Load environment variables
-load_dotenv()
+load_dotenv(os.path.join(BASE_DIR, '.env'))
 
 DB_CONNECTION_STRING = os.getenv('SQL_CONNECTION_STRING')
 
@@ -46,7 +49,9 @@ def run_initialization():
 			files = ['drop_tables.sql', 'tables.sql', 'triggers.sql', 'views.sql']
 
 			for file_name in files:
-				execute_sql_file(cursor, file_name)
+				# Use absolute path for SQL files
+				full_path = os.path.join(BASE_DIR, file_name)
+				execute_sql_file(cursor, full_path)
 				conn.commit()
 				print(f"Successfully executed {file_name}")
 

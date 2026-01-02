@@ -1,13 +1,17 @@
 import sys
 import csv
+import os
 
 # --- Global Settings ---
 csv.field_size_limit(sys.maxsize)
 
 # --- File Paths ---
-DIR_MPC = 'output_tables_mpcorb'
-DIR_NEO = 'output_tables_neo'
-OUTPUT_DIR = 'final_dataset'
+# Determine the project root directory (2 levels up from this file)
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+DIR_MPC = os.path.join(BASE_DIR, 'output_tables_mpcorb')
+DIR_NEO = os.path.join(BASE_DIR, 'output_tables_neo')
+OUTPUT_DIR = os.path.join(BASE_DIR, 'final_dataset')
 
 # --- Table Filenames ---
 FILES = {

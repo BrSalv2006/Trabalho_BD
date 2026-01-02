@@ -1,14 +1,17 @@
 import os
 from dotenv import load_dotenv
 
+# Determine the project root directory (2 levels up from this file)
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 # --- Database Connection ---
-load_dotenv()
+load_dotenv(os.path.join(BASE_DIR, '.env'))
 
 DB_CONNECTION_STRING = os.getenv('SQL_CONNECTION_STRING')
 
 # --- Input Configuration ---
 # Directory containing the merged CSV files
-INPUT_DIR = 'final_dataset'
+INPUT_DIR = os.path.join(BASE_DIR, 'final_dataset')
 
 # Number of rows to insert per transaction
 BATCH_SIZE = 1000
