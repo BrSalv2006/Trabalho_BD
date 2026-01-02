@@ -6,11 +6,13 @@ import os
 csv.field_size_limit(sys.maxsize)
 
 # --- File Paths ---
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# Determine directories
+CURRENT_DIR = os.path.abspath(__file__)
+IMPORTER_DIR = os.path.dirname(os.path.dirname(CURRENT_DIR))
 
-DIR_MPC = os.path.join(BASE_DIR, 'output_tables_mpcorb')
-DIR_NEO = os.path.join(BASE_DIR, 'output_tables_neo')
-OUTPUT_DIR = os.path.join(BASE_DIR, 'final_dataset')
+DIR_MPC = os.path.join(IMPORTER_DIR, 'output_tables_mpcorb')
+DIR_NEO = os.path.join(IMPORTER_DIR, 'output_tables_neo')
+OUTPUT_DIR = os.path.join(IMPORTER_DIR, 'final_dataset')
 
 # --- Table Filenames ---
 FILES = {

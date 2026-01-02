@@ -10,10 +10,13 @@ import csv
 csv.field_size_limit(sys.maxsize)
 
 # --- File Paths ---
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# Determine directories
+CURRENT_DIR = os.path.abspath(__file__)
+IMPORTER_DIR = os.path.dirname(os.path.dirname(CURRENT_DIR))
+PROJECT_ROOT = os.path.dirname(IMPORTER_DIR)
 
-INPUT_FILE = os.path.join(BASE_DIR, 'DATASETS', 'mpcorb.csv')
-OUTPUT_DIR = os.path.join(BASE_DIR, 'output_tables_mpcorb')
+INPUT_FILE = os.path.join(PROJECT_ROOT, 'DATASETS', 'mpcorb.csv')
+OUTPUT_DIR = os.path.join(IMPORTER_DIR, 'output_tables_mpcorb')
 
 # --- Processing Configuration ---
 CHUNK_SIZE = 100000
