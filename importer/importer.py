@@ -65,7 +65,8 @@ class DBImporter:
 						"FIELDTERMINATOR = ','",
 						"ROWTERMINATOR = '\\n'",
 						"FIRSTROW = 2",
-						"TABLOCK"
+						"TABLOCK",
+						"FIRE_TRIGGERS"
 					]
 					if table_name in IDENTITY_TABLES:
 						options.append("KEEPIDENTITY")

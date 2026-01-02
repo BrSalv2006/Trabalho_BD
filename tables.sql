@@ -1,10 +1,3 @@
--- Database Schema for Asteroid Data
--- Organized by dependency levels
-
--- =============================================
--- Level 1: Independent Tables
--- =============================================
-
 CREATE TABLE Classe (
 	IDClasse INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
 	Descricao VARCHAR(255),
@@ -43,18 +36,11 @@ CREATE TABLE Asteroide (
 );
 GO
 
--- =============================================
--- Indexes for Asteroide
--- =============================================
 CREATE UNIQUE NONCLUSTERED INDEX IX_Asteroide_spkid ON Asteroide(spkid) WHERE spkid IS NOT NULL;
 CREATE INDEX IX_Asteroide_pdes ON Asteroide(pdes);
 CREATE INDEX IX_Asteroide_number ON Asteroide(number) WHERE number IS NOT NULL;
 CREATE INDEX IX_Asteroide_Flags ON Asteroide(pha, neo) INCLUDE (diameter, H);
 GO
-
--- =============================================
--- Level 2: Dependent Tables
--- =============================================
 
 CREATE TABLE Astronomo (
 	IDAstronomo INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
@@ -133,7 +119,7 @@ CREATE TABLE Imagem (
 	IDAsteroide INT NOT NULL,
 	URL VARCHAR(255),
 	Data_imagem DATE,
-	Descricao TEXT,
+	Descricao VARCHAR(255),
 	FOREIGN KEY (IDAsteroide) REFERENCES Asteroide(IDAsteroide)
 );
 GO
@@ -144,7 +130,7 @@ CREATE TABLE Alerta (
 	Data_Alerta DATE,
 	Prioridade VARCHAR(20),
 	Nivel INT,
-	Descricao TEXT,
+	Descricao VARCHAR(255),
 	Estado VARCHAR(20),
 	FOREIGN KEY (IDAsteroide) REFERENCES Asteroide(IDAsteroide)
 );
