@@ -7,8 +7,7 @@ GO
 
 CREATE TABLE Software (
 	IDSoftware INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
-	Nome VARCHAR(100),
-	Versao VARCHAR(20)
+	Nome VARCHAR(100)
 );
 GO
 

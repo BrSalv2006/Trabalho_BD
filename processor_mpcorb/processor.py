@@ -281,8 +281,7 @@ class AsteroidProcessor:
 		# Software
 		if self.software_map and 'mpcorb_software.csv' in self.file_handles:
 			df = pd.DataFrame(list(self.software_map.items()), columns=['Nome', 'IDSoftware'])
-			df['Versao'] = ""
-			df[['IDSoftware', 'Nome', 'Versao']].to_csv(self.file_handles['mpcorb_software.csv'], mode='a', header=False, index=False)
+			df[['IDSoftware', 'Nome']].to_csv(self.file_handles['mpcorb_software.csv'], mode='a', header=False, index=False)
 
 		# Astronomers
 		if self.astronomer_map and 'mpcorb_astronomers.csv' in self.file_handles:

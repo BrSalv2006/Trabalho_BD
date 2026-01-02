@@ -102,7 +102,7 @@ SCHEMAS = {
 		'Hex_Flags', 'Is1kmNEO', 'IsCriticalList', 'IsOneOppositionEarlier', 'IDClasse'
 	],
 	'mpcorb_software.csv': [
-		'IDSoftware', 'Nome', 'Versao'
+		'IDSoftware', 'Nome'
 	],
 	'mpcorb_classes.csv': [
 		'IDClasse', 'Descricao', 'CodClasse'
