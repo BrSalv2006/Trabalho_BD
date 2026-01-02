@@ -114,6 +114,14 @@ def process_chunk_worker(chunk: pd.DataFrame) -> pd.DataFrame:
 		else:
 			chunk.loc[is_unnumbered, 'pdes_clean'] = chunk.loc[is_unnumbered, 'full_name_clean']
 
+	moid_ld_numeric = pd.to_numeric(chunk['moid_ld'], errors='coerce').fillna(0)
+	moid_str = chunk['moid'].fillna("").astype(str).str.strip()
+	moid_is_empty = (moid_str == "") | (moid_str.str.lower() == "nan") | (moid_str.str.lower() == "<na>")
+	mask_invalid_moid = (moid_ld_numeric == 0) & moid_is_empty
+
+	if mask_invalid_moid.any():
+		chunk.loc[mask_invalid_moid, 'moid_ld'] = ""
+
 	return chunk
 
 # --- Main Processor Class ---
