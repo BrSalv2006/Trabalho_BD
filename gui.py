@@ -14,6 +14,7 @@ def run_worker_process(task_name, log_queue, env_vars):
 	import os
 	import sys
 	import shutil
+	import time
 	os.environ.update(env_vars)
 
 	# 2. Redirect Print Statements to Queue
@@ -97,6 +98,7 @@ def run_worker_process(task_name, log_queue, env_vars):
 			init_db.run_initialization()
 
 		elif task_name == "FULL":
+			start_time = time.time()
 			print("="*60)
 			print("ASTEROID DATA PIPELINE AUTOMATION")
 			print("="*60)
@@ -125,8 +127,10 @@ def run_worker_process(task_name, log_queue, env_vars):
 				ImporterConfig.DB_CONNECTION_STRING = os.environ.get('SQL_CONNECTION_STRING')
 			DBImporter.DBImporter().run()
 
+			end_time = time.time()
+			duration = end_time - start_time
 			print("\n" + "="*60)
-			print("FULL PIPELINE COMPLETE.")
+			print(f"FULL PIPELINE COMPLETE in {duration:.2f} seconds.")
 			print("="*60)
 
 	except Exception as e:
