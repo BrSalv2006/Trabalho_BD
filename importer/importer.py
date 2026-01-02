@@ -59,6 +59,11 @@ class DBImporter:
 
 		try:
 			with self._get_connection() as conn:
+				try:
+					conn.autocommit = True
+				except Exception:
+					pass
+
 				with conn.cursor() as cursor:
 					# Configure BULK INSERT options
 					options = [
@@ -75,7 +80,8 @@ class DBImporter:
 
 					print(f"Executing BULK INSERT...")
 					cursor.execute(sql)
-					conn.commit()
+					if not getattr(conn, 'autocommit', False):
+						conn.commit()
 
 		except Exception as e:
 			print(f"\n[ERROR] Failed to import {filename}.")
@@ -127,7 +133,7 @@ class DBImporter:
 								cursor.executemany(sql, batch)
 								conn.commit()
 								count += len(batch)
-								print(f"  Imported {count} rows...", end='\r')
+								print(f"  Imported {count} rows (Committed)...", end='\r')
 								batch = []
 
 						if batch:

@@ -11,7 +11,7 @@ DB_CONNECTION_STRING = os.getenv('SQL_CONNECTION_STRING')
 INPUT_DIR = 'final_dataset'
 
 # Number of rows to insert per transaction
-BATCH_SIZE = 100000
+BATCH_SIZE = 1000
 
 # --- Table Mapping ---
 # Maps the CSV filename to the destination Table Name in the database.
@@ -39,35 +39,3 @@ IMPORT_ORDER = [
 # Tables that have an IDENTITY column where we need to insert explicit IDs from the CSV.
 # Added 'Orbita' and 'Observacao' to ensure IDs match the CSVs.
 IDENTITY_TABLES = {'Classe', 'Software', 'Astronomo', 'Asteroide', 'Orbita', 'Observacao'}
-
-# --- String Limits (Truncation) ---
-STRING_LIMITS = {
-	'Asteroide': {
-		'spkid': 20,
-		'pdes': 20,
-		'name': 100,
-		'prefix': 10
-	},
-	'Orbita': {
-		'uncertainty': 10,
-		'Reference': 50,
-		'Arc': 20,
-		'Coarse_Perts': 20,
-		'Precise_Perts': 20,
-		'Hex_Flags': 10
-	},
-	'Software': {
-		'Nome': 100,
-		'Versao': 20
-	},
-	'Astronomo': {
-		'Nome': 100
-	},
-	'Classe': {
-		'CodClasse': 50,
-		'Descricao': 255
-	},
-	'Observacao': {
-		'Modo': 50
-	}
-}

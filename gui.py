@@ -249,7 +249,7 @@ class AsteroidPipelineApp:
 		self.btn_step4.grid(row=1, column=1, sticky="ew", padx=(5, 0), pady=5)
 
 		# Options
-		self.use_bulk_var = tk.BooleanVar(value=False)
+		self.use_bulk_var = tk.BooleanVar(value=True)
 		self.chk_bulk = ttk.Checkbutton(act_content, text="Use BULK INSERT (Faster, requires permissions)", variable=self.use_bulk_var, style="TCheckbutton")
 		self.chk_bulk.pack(fill=tk.X, pady=(10, 0))
 

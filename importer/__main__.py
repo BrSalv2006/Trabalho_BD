@@ -13,7 +13,8 @@ def main():
 		sys.exit(1)
 
 	try:
-		use_bulk = "--bulk" in sys.argv
+		use_standard = "--standard" in sys.argv
+		use_bulk = not use_standard
 		if use_bulk:
 			print("Mode: BULK INSERT (Fast)")
 		else:
