@@ -1,16 +1,16 @@
 CREATE OR ALTER VIEW vw_EstatisticasAlerta AS
 SELECT
-    (SELECT COUNT(*) FROM Alerta WHERE Nivel = 4 AND Estado = 'Ativo') AS Alertas_Vermelhos,
-    (SELECT COUNT(*) FROM Alerta WHERE Nivel = 3 AND Estado = 'Ativo') AS Alertas_Laranja,
-    (SELECT COUNT(*) FROM Asteroide WHERE pha = 1 AND diameter > 0.1) AS Total_PHAs_Monitorizados_GT_100m;
+	(SELECT COUNT(*) FROM Alerta WHERE Nivel = 4 AND Estado = 'Ativo') AS Alertas_Vermelhos,
+	(SELECT COUNT(*) FROM Alerta WHERE Nivel = 3 AND Estado = 'Ativo') AS Alertas_Laranja,
+	(SELECT COUNT(*) FROM Asteroide WHERE pha = 1 AND diameter > 0.1) AS Total_PHAs_Monitorizados_GT_100m;
 GO
 
 CREATE OR ALTER VIEW vw_ProximosEventosCriticos AS
 SELECT TOP 1
-    o.tp AS Data_Proxima_Aproximacao,
-    a.name AS Nome,
+	o.tp AS Data_Proxima_Aproximacao,
+	a.name AS Nome,
 	a.pdes as Designacao_Provisoria,
-    o.moid_ld AS Distancia_Lunar
+	o.moid_ld AS Distancia_Lunar
 FROM Orbita o
 JOIN Asteroide a ON o.IDAsteroide = a.IDAsteroide
 WHERE o.moid_ld IS NOT NULL
