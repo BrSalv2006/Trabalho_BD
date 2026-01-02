@@ -90,6 +90,15 @@ def run_worker_process(task_name, log_queue, env_vars):
 				ImporterConfig.DB_CONNECTION_STRING = os.environ.get('SQL_CONNECTION_STRING')
 			DBImporter.DBImporter().run()
 
+		elif task_name == "INIT_DB":
+			print("\n[Maintenance] Initializing Database...")
+			set_status("Initializing Database...")
+			import init_db
+			# Patch Connection String if env var is set
+			if 'SQL_CONNECTION_STRING' in os.environ:
+				init_db.DB_CONNECTION_STRING = os.environ.get('SQL_CONNECTION_STRING')
+			init_db.run_initialization()
+
 		elif task_name == "FULL":
 			print("="*60)
 			print("ASTEROID DATA PIPELINE AUTOMATION")
@@ -243,7 +252,10 @@ class AsteroidPipelineApp:
 		maint_content.pack(fill=tk.BOTH)
 
 		self.btn_clean = ttk.Button(maint_content, text="🗑 Clean Output Directories", style="Danger.TButton", command=lambda: self.start_process("CLEAN"))
-		self.btn_clean.pack(fill=tk.X)
+		self.btn_clean.pack(fill=tk.X, pady=(0, 5))
+
+		self.btn_init_db = ttk.Button(maint_content, text="⚠ Initialize Database (Drop & Recreate)", style="Danger.TButton", command=lambda: self.start_process("INIT_DB"))
+		self.btn_init_db.pack(fill=tk.X)
 
 		# Configuration
 		config_frame = ttk.LabelFrame(left_panel, text=" Configuration (.env) ", style="Card.TLabelframe", padding=15)
@@ -358,6 +370,7 @@ class AsteroidPipelineApp:
 		self.btn_step3.configure(state=state)
 		self.btn_step4.configure(state=state)
 		self.btn_clean.configure(state=state)
+		self.btn_init_db.configure(state=state)
 
 	def _enable_controls(self):
 		state = 'normal'
@@ -367,6 +380,7 @@ class AsteroidPipelineApp:
 		self.btn_step3.configure(state=state)
 		self.btn_step4.configure(state=state)
 		self.btn_clean.configure(state=state)
+		self.btn_init_db.configure(state=state)
 
 	# --- Config ---
 	def load_env_config(self):
