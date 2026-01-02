@@ -149,7 +149,7 @@ class AsteroidPipelineApp:
 		self.root = root
 		self.root.title("Asteroid Data Pipeline Controller")
 		self.root.geometry("1150x800")
-		
+
 		self.colors = {
 			'bg_app': '#1e1e1e',
 			'bg_header': '#252526',
@@ -177,26 +177,25 @@ class AsteroidPipelineApp:
 	def _setup_styles(self):
 		style = ttk.Style()
 		style.theme_use('clam')
-		
+
 		style.configure(".", background=self.colors['bg_app'], foreground=self.colors['text_main'], font=("Segoe UI", 10))
 		style.configure("TFrame", background=self.colors['bg_app'])
-		
+
 		style.configure("Card.TLabelframe", background=self.colors['card'], relief="solid", borderwidth=1, bordercolor=self.colors['border'])
 		style.configure("Card.TLabelframe.Label", background=self.colors['card'], foreground=self.colors['text_main'], font=("Segoe UI", 10, "bold"))
-		
-		
+
 		style.configure("Primary.TButton", background=self.colors['success'], foreground="#ffffff", font=("Segoe UI", 11, "bold"), borderwidth=0)
-		style.map("Primary.TButton", 
+		style.map("Primary.TButton",
 				  background=[('active', '#2ea043'), ('disabled', '#238636')],
 				  foreground=[('active', '#ffffff'), ('disabled', '#aaaaaa')])
 
 		style.configure("Action.TButton", background=self.colors['accent'], foreground="#ffffff", font=("Segoe UI", 10, "bold"), borderwidth=0)
-		style.map("Action.TButton", 
+		style.map("Action.TButton",
 				  background=[('active', self.colors['accent_hover']), ('disabled', '#007acc')],
 				  foreground=[('active', '#ffffff'), ('disabled', '#aaaaaa')])
 
 		style.configure("Danger.TButton", background=self.colors['danger'], foreground="#ffffff", font=("Segoe UI", 10, "bold"))
-		style.map("Danger.TButton", 
+		style.map("Danger.TButton",
 				  background=[('active', '#f85149')],
 				  foreground=[('active', '#ffffff'), ('disabled', '#aaaaaa')])
 
@@ -239,7 +238,7 @@ class AsteroidPipelineApp:
 		config_frame.pack(fill=tk.BOTH, expand=True)
 		self.txt_config = scrolledtext.ScrolledText(config_frame, height=8, font=("Consolas", 9), bg="#1e1e1e", fg="#d4d4d4", insertbackground="white", relief="flat", padx=5, pady=5)
 		self.txt_config.pack(fill=tk.BOTH, expand=True, pady=(0, 10))
-		
+
 		btn_row = tk.Frame(config_frame, bg=self.colors['card'])
 		btn_row.pack(fill=tk.X)
 		ttk.Button(btn_row, text="💾 Save Changes", style="Action.TButton", command=self.save_env_config).pack(side=tk.RIGHT)
