@@ -288,10 +288,6 @@ class AsteroidProcessor:
 			df_orb[col] = expand_col(col)
 
 		# Empty/Default columns
-		df_orb['Hex_Flags'] = ""
-		df_orb['Is1kmNEO'] = ""
-		df_orb['IsCriticalList'] = ""
-		df_orb['IsOneOppositionEarlier'] = ""
 		df_orb['uncertainty'] = ""
 		df_orb['Reference'] = ""
 		df_orb['Num_Obs'] = ""

@@ -8,8 +8,7 @@ from concurrent.futures import ProcessPoolExecutor
 from processor_mpcorb.config import (
 	SCHEMAS, CHUNK_SIZE, MPCORB_DTYPES,
 	SOFTWARE_PREFIXES, SOFTWARE_SPECIFIC_NAMES,
-	MASK_ORBIT_TYPE, ORBIT_TYPES, MASK_NEO, MASK_PHA,
-	MASK_1KM_NEO, MASK_CRITICAL_LIST, MASK_1_OPPOSITION
+	MASK_ORBIT_TYPE, ORBIT_TYPES, MASK_NEO, MASK_PHA
 )
 from processor_mpcorb.utils import ensure_directory, unpack_designation, unpack_packed_date, calculate_tp, expand_scientific_notation
 
@@ -67,9 +66,6 @@ def process_chunk_worker(chunk: pd.DataFrame) -> pd.DataFrame:
 	chunk['OrbitType'] = pd.Series(flags_int & MASK_ORBIT_TYPE).map(ORBIT_TYPES).fillna("").values
 	chunk['is_neo_flag'] = ((flags_int & MASK_NEO) != 0).astype(int)
 	chunk['is_pha_flag'] = ((flags_int & MASK_PHA) != 0).astype(int)
-	chunk['is_1km_neo'] = ((flags_int & MASK_1KM_NEO) != 0).astype(int)
-	chunk['is_critical'] = ((flags_int & MASK_CRITICAL_LIST) != 0).astype(int)
-	chunk['is_opp_earlier'] = ((flags_int & MASK_1_OPPOSITION) != 0).astype(int)
 
 	# 5. Date Parsing
 	chunk['epoch_iso'] = chunk['epoch'].map(unpack_packed_date)
@@ -362,10 +358,6 @@ class AsteroidProcessor:
 		for col in empty_cols:
 			df_orb[col] = ""
 
-		df_orb['Hex_Flags'] = chunk['hex_flags']
-		df_orb['Is1kmNEO'] = chunk['is_1km_neo']
-		df_orb['IsCriticalList'] = chunk['is_critical']
-		df_orb['IsOneOppositionEarlier'] = chunk['is_opp_earlier']
 		df_orb['uncertainty'] = chunk['uncertainty']
 		df_orb['Reference'] = chunk['reference']
 

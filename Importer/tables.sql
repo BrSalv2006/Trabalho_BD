@@ -1,19 +1,19 @@
 CREATE TABLE Classe (
 	IDClasse INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
 	Descricao VARCHAR(255),
-	CodClasse VARCHAR(50) UNIQUE
+	CodClasse VARCHAR(50) NOT NULL UNIQUE
 );
 GO
 
 CREATE TABLE Software (
 	IDSoftware INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
-	Nome VARCHAR(100) UNIQUE
+	Nome VARCHAR(100) NOT NULL UNIQUE
 );
 GO
 
 CREATE TABLE Centro_de_observacao (
 	IDCentro INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
-	Nome VARCHAR(100),
+	Nome VARCHAR(100) NOT NULL,
 	Localizacao VARCHAR(100)
 );
 GO
@@ -25,13 +25,15 @@ CREATE TABLE Asteroide (
 	pdes VARCHAR(20),
 	name VARCHAR(100),
 	prefix VARCHAR(10),
-	neo BIT,
-	pha BIT,
+	neo BIT NOT NULL DEFAULT 0,
+	pha BIT NOT NULL DEFAULT 0,
 	H DECIMAL(10, 5),
 	G DECIMAL(10, 5),
 	diameter DECIMAL(10, 5),
 	diameter_sigma DECIMAL(10, 5),
-	albedo DECIMAL(10, 5)
+	albedo DECIMAL(10, 5),
+	CONSTRAINT CK_Asteroide_Diameter CHECK (diameter > 0),
+	CONSTRAINT CK_Asteroide_Albedo CHECK (albedo >= 0 AND albedo <= 1)
 );
 GO
 
@@ -44,7 +46,7 @@ GO
 
 CREATE TABLE Astronomo (
 	IDAstronomo INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
-	Nome VARCHAR(100),
+	Nome VARCHAR(100) NOT NULL,
 	IDCentro INT NOT NULL,
 	FOREIGN KEY (IDCentro) REFERENCES Centro_de_observacao(IDCentro)
 );
@@ -52,8 +54,8 @@ GO
 
 CREATE TABLE Equipamento (
 	IDEquipamento INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
-	Nome VARCHAR(100),
-	Tipo VARCHAR(50),
+	Nome VARCHAR(100) NOT NULL,
+	Tipo VARCHAR(50) NOT NULL,
 	IDCentro INT NOT NULL,
 	FOREIGN KEY (IDCentro) REFERENCES Centro_de_observacao(IDCentro)
 );
@@ -84,13 +86,12 @@ CREATE TABLE Orbita (
 	Arc VARCHAR(20),
 	Coarse_Perts VARCHAR(20),
 	Precise_Perts VARCHAR(20),
-	Hex_Flags VARCHAR(10),
-	Is1kmNEO BIT,
-	IsCriticalList BIT,
-	IsOneOppositionEarlier BIT,
 	IDClasse INT,
 	FOREIGN KEY (IDAsteroide) REFERENCES Asteroide(IDAsteroide),
-	FOREIGN KEY (IDClasse) REFERENCES Classe(IDClasse)
+	FOREIGN KEY (IDClasse) REFERENCES Classe(IDClasse),
+	CONSTRAINT CK_Orbita_Eccentricity CHECK (e >= 0),
+	CONSTRAINT CK_Orbita_Inclination CHECK (i >= 0 AND i <= 180),
+	CONSTRAINT CK_Orbita_Perihelion CHECK (q > 0)
 );
 GO
 
@@ -127,11 +128,14 @@ GO
 CREATE TABLE Alerta (
 	ID_Alerta INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
 	IDAsteroide INT NOT NULL,
-	Data_Alerta DATE,
-	Prioridade VARCHAR(20),
-	Nivel INT,
-	Descricao VARCHAR(255),
-	Estado VARCHAR(20),
-	FOREIGN KEY (IDAsteroide) REFERENCES Asteroide(IDAsteroide)
+	Data_Alerta DATE NOT NULL,
+	Prioridade VARCHAR(20) NOT NULL,
+	Nivel INT NOT NULL,
+	Descricao VARCHAR(255) NOT NULL,
+	Estado VARCHAR(20) NOT NULL DEFAULT 'Ativo',
+	FOREIGN KEY (IDAsteroide) REFERENCES Asteroide(IDAsteroide),
+	CONSTRAINT CK_Alerta_Prioridade CHECK (Prioridade IN ('Baixa', 'Média', 'Alta')),
+	CONSTRAINT CK_Alerta_Estado CHECK (Estado IN ('Ativo', 'Resolvido', 'Ignorado')),
+	CONSTRAINT CK_Alerta_Nivel CHECK (Nivel BETWEEN 0 AND 4)
 );
 GO

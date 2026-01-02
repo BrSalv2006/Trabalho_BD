@@ -87,8 +87,7 @@ SCHEMAS = {
 		'IDOrbita', 'IDAsteroide', 'epoch', 'e', 'sigma_e', 'a', 'sigma_a', 'q', 'sigma_q',
 		'i', 'sigma_i', 'om', 'sigma_om','w', 'sigma_w', 'ma', 'sigma_ma','ad','sigma_ad',
 		'n', 'sigma_n', 'tp', 'sigma_tp', 'per', 'sigma_per', 'moid', 'moid_ld','rms', 'uncertainty',
-		'Reference', 'Num_Obs', 'Num_Opp', 'Arc', 'Coarse_Perts', 'Precise_Perts',
-		'Hex_Flags', 'Is1kmNEO', 'IsCriticalList', 'IsOneOppositionEarlier', 'IDClasse'
+		'Reference', 'Num_Obs', 'Num_Opp', 'Arc', 'Coarse_Perts', 'Precise_Perts', 'IDClasse'
 	],
 	'neo_classes.csv': [
 		'IDClasse', 'Descricao', 'CodClasse'
