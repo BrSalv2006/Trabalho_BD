@@ -2,6 +2,7 @@ import multiprocessing
 import tkinter as tk
 from tkinter import ttk, scrolledtext
 import os
+import sys
 import queue
 
 # --- WORKER PROCESS (Top-Level) ---
@@ -448,6 +449,11 @@ class AsteroidPipelineApp:
 if __name__ == "__main__":
 	# Crucial for Windows Multiprocessing
 	multiprocessing.freeze_support()
+
+	if sys.stdout is None:
+		sys.stdout = open(os.devnull, 'w')
+	if sys.stderr is None:
+		sys.stderr = open(os.devnull, 'w')
 
 	root = tk.Tk()
 	app = AsteroidPipelineApp(root)
