@@ -35,9 +35,6 @@ BEGIN
 END;
 GO
 
-DROP TRIGGER IF EXISTS trg_alerta_alta_prioridade;
-GO
-
 CREATE TRIGGER trg_alerta_alta_prioridade
 ON Orbita
 AFTER INSERT, UPDATE
@@ -78,9 +75,6 @@ BEGIN
 END;
 GO
 
-DROP TRIGGER IF EXISTS trg_alerta_media_prioridade;
-GO
-
 CREATE TRIGGER trg_alerta_media_prioridade
 ON Orbita
 AFTER INSERT, UPDATE
@@ -115,9 +109,6 @@ BEGIN
 	WHERE (ABS(i.e - d.e) > 0.05 OR ABS(i.i - d.i) > 2)
 	  AND NOT EXISTS (SELECT 1 FROM Alerta al WHERE al.IDAsteroide = i.IDAsteroide AND al.Descricao = 'Mudança orbital significativa' AND al.Estado = 'Ativo');
 END;
-GO
-
-DROP TRIGGER IF EXISTS trg_alerta_baixa_prioridade;
 GO
 
 CREATE TRIGGER trg_alerta_baixa_prioridade

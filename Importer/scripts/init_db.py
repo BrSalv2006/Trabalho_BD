@@ -45,7 +45,7 @@ def run_initialization():
 		with mssql_python.connect(DB_CONNECTION_STRING) as conn:
 			cursor = conn.cursor()
 
-			files = ['drop_tables.sql', 'tables.sql', 'triggers.sql', 'views.sql']
+			files = ['drop_tables.sql', 'tables.sql', 'triggers.sql', 'procedures.sql', 'views.sql']
 
 			# SQL files are in the Importer directory (one level up from scripts)
 			SQL_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

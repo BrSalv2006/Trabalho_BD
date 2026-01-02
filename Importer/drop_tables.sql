@@ -1,3 +1,5 @@
+IF OBJECT_ID('dbo.sp_AlterarEstadoAlerta', 'P') IS NOT NULL DROP PROCEDURE sp_AlterarEstadoAlerta;
+
 IF OBJECT_ID('vw_Last5Detected', 'V') IS NOT NULL DROP VIEW vw_Last5Detected;
 IF OBJECT_ID('vw_PHA_NEO', 'V') IS NOT NULL DROP VIEW vw_PHA_NEO;
 IF OBJECT_ID('vw_TopCenters', 'V') IS NOT NULL DROP VIEW vw_TopCenters;
@@ -6,6 +8,10 @@ IF OBJECT_ID('vw_EstatisticasAlerta', 'V') IS NOT NULL DROP VIEW vw_Estatisticas
 IF OBJECT_ID('vw_ProximosEventosCriticos', 'V') IS NOT NULL DROP VIEW vw_ProximosEventosCriticos;
 IF OBJECT_ID('vw_EstatisticasDescoberta', 'V') IS NOT NULL DROP VIEW vw_EstatisticasDescoberta;
 IF OBJECT_ID('vw_EvolucaoPrecisao', 'V') IS NOT NULL DROP VIEW vw_EvolucaoPrecisao;
+
+IF OBJECT_ID('trg_alerta_alta_prioridade', 'TR') IS NOT NULL DROP TRIGGER trg_alerta_alta_prioridade;
+IF OBJECT_ID('trg_alerta_media_prioridade', 'TR') IS NOT NULL DROP TRIGGER trg_alerta_media_prioridade;
+IF OBJECT_ID('trg_alerta_baixa_prioridade', 'TR') IS NOT NULL DROP TRIGGER trg_alerta_baixa_prioridade;
 
 IF OBJECT_ID('Alerta', 'U') IS NOT NULL DROP TABLE Alerta;
 IF OBJECT_ID('Imagem', 'U') IS NOT NULL DROP TABLE Imagem;

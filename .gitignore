@@ -3,4 +3,3 @@ output_tables_*/
 final_dataset/
 __pycache__/
 .env
-app_*

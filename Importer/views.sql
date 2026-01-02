@@ -8,9 +8,11 @@ GO
 CREATE OR ALTER VIEW vw_ProximosEventosCriticos AS
 SELECT TOP 5
 	o.tp AS Data_Proxima_Aproximacao,
+	a.IDAsteroide AS IDAsteroide,
 	a.name AS Nome,
 	a.pdes as Designacao_Provisoria,
-	o.moid_ld AS Distancia_Lunar
+	o.moid_ld AS Distancia_Lunar,
+	a.diameter AS Diametro
 FROM Orbita o
 JOIN Asteroide a ON o.IDAsteroide = a.IDAsteroide
 WHERE o.moid_ld IS NOT NULL
@@ -34,7 +36,7 @@ SELECT TOP 1000
 	YEAR(epoch) AS Ano,
 	AVG(rms) AS rms_medio
 FROM Orbita
-WHERE epoch IS NOT NULL
+WHERE epoch IS NOT NULL AND rms IS NOT NULL
 GROUP BY YEAR(epoch)
 ORDER BY Ano ASC;
 GO
