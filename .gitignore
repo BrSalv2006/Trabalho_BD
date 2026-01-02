@@ -1,5 +1,5 @@
-/DATASETS
+DATASETS/
 output_tables_*/
 final_dataset/
-**/__pycache__/
+__pycache__/
 .env

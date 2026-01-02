@@ -148,157 +148,113 @@ class AsteroidPipelineApp:
 	def __init__(self, root):
 		self.root = root
 		self.root.title("Asteroid Data Pipeline Controller")
-		self.root.geometry("1100x800")
-		self.root.minsize(900, 700)
+		self.root.geometry("1150x800")
+		
+		self.colors = {
+			'bg_app': '#1e1e1e',
+			'bg_header': '#252526',
+			'text_main': '#d4d4d4',
+			'accent': '#007acc',
+			'accent_hover': '#0062a3',
+			'border': '#3e3e42',
+			'card': '#252526',
+			'success': '#238636',
+			'danger': '#da3633',
+			'console_bg': '#1e1e1e',
+			'console_fg': '#cccccc'
+		}
+		self.root.configure(bg=self.colors['bg_app'])
 
-		# Process & Logging
 		self.current_process = None
-		# We use a Multiprocessing Queue for IPC
 		self.log_queue = multiprocessing.Queue()
 		self.is_running = False
 
-		# Theme Colors
-		self.colors = {
-			"bg": "#2b2b2b",
-			"panel": "#3c3f41",
-			"fg": "#e0e0e0",
-			"accent": "#007acc",
-			"success": "#388e3c",
-			"warning": "#d32f2f",
-			"text_bg": "#1e1e1e",
-			"header": "#ffffff"
-		}
-
-		# Setup UI
 		self._setup_styles()
-		self.root.configure(bg=self.colors["bg"])
 		self._create_layout()
-
-		# Load Config
 		self.load_env_config()
-		self.log_message("Ready. System initialized (Multiprocessing Enabled).\n")
-
-		# Start Polling Loop
 		self.root.after(100, self._poll_queue)
 
 	def _setup_styles(self):
 		style = ttk.Style()
 		style.theme_use('clam')
+		
+		style.configure(".", background=self.colors['bg_app'], foreground=self.colors['text_main'], font=("Segoe UI", 10))
+		style.configure("TFrame", background=self.colors['bg_app'])
+		
+		style.configure("Card.TLabelframe", background=self.colors['card'], relief="solid", borderwidth=1, bordercolor=self.colors['border'])
+		style.configure("Card.TLabelframe.Label", background=self.colors['card'], foreground=self.colors['text_main'], font=("Segoe UI", 10, "bold"))
+		
+		
+		style.configure("Primary.TButton", background=self.colors['success'], foreground="#ffffff", font=("Segoe UI", 11, "bold"), borderwidth=0)
+		style.map("Primary.TButton", 
+				  background=[('active', '#2ea043'), ('disabled', '#238636')],
+				  foreground=[('active', '#ffffff'), ('disabled', '#aaaaaa')])
 
-		# Styles (Same as before)
-		style.configure(".", background=self.colors["bg"], foreground=self.colors["fg"], font=("Segoe UI", 10))
-		style.configure("TFrame", background=self.colors["bg"])
-		style.configure("TPanedwindow", background=self.colors["bg"])
+		style.configure("Action.TButton", background=self.colors['accent'], foreground="#ffffff", font=("Segoe UI", 10, "bold"), borderwidth=0)
+		style.map("Action.TButton", 
+				  background=[('active', self.colors['accent_hover']), ('disabled', '#007acc')],
+				  foreground=[('active', '#ffffff'), ('disabled', '#aaaaaa')])
 
-		style.configure("Card.TLabelframe", background=self.colors["panel"], relief="solid", borderwidth=1, bordercolor="#555")
-		style.configure("Card.TLabelframe.Label", background=self.colors["panel"], foreground=self.colors["header"], font=("Segoe UI", 11, "bold"))
-		style.configure("Panel.TFrame", background=self.colors["panel"])
+		style.configure("Danger.TButton", background=self.colors['danger'], foreground="#ffffff", font=("Segoe UI", 10, "bold"))
+		style.map("Danger.TButton", 
+				  background=[('active', '#f85149')],
+				  foreground=[('active', '#ffffff'), ('disabled', '#aaaaaa')])
 
-		style.configure("TButton", padding=8, relief="flat", borderwidth=0, font=("Segoe UI", 9, "bold"))
-		style.configure("TCheckbutton", background=self.colors["panel"], foreground=self.colors["fg"], font=("Segoe UI", 9))
-		style.map("TCheckbutton", background=[('active', self.colors["panel"])])
-		style.configure("Primary.TButton", background=self.colors["success"], foreground="white", font=("Segoe UI", 12, "bold"))
-		style.map("Primary.TButton", background=[('active', '#4caf50'), ('disabled', '#2e5c31')])
-
-		style.configure("Step.TButton", background=self.colors["accent"], foreground="white")
-		style.map("Step.TButton", background=[('active', '#2196f3'), ('disabled', '#1a4e75')])
-
-		style.configure("Danger.TButton", background=self.colors["warning"], foreground="white")
-		style.map("Danger.TButton", background=[('active', '#f44336'), ('disabled', '#752828')])
-
-		style.configure("MainHeader.TLabel", font=("Segoe UI", 18, "bold"), foreground="white", padding=10)
-		style.configure("Status.TLabel", background=self.colors["accent"], foreground="white", font=("Segoe UI", 10), padding=5)
+		style.configure("TCheckbutton", background=self.colors['card'], foreground=self.colors['text_main'], font=("Segoe UI", 10))
+		style.map("TCheckbutton", background=[('active', self.colors['card'])])
 
 	def _create_layout(self):
-		# Header
-		header_frame = ttk.Frame(self.root)
-		header_frame.pack(fill=tk.X)
-		ttk.Label(header_frame, text="🚀 Asteroid Data Pipeline", style="MainHeader.TLabel").pack(side=tk.LEFT)
+		header = tk.Frame(self.root, bg=self.colors['bg_header'], height=70, highlightthickness=1, highlightbackground=self.colors['border'])
+		header.pack(fill=tk.X)
+		tk.Label(header, text="Asteroid Data Pipeline", font=("Segoe UI", 20, "bold"), bg=self.colors['bg_header'], fg="white").pack(side=tk.LEFT, padx=30, pady=15)
 
-		# Main Split Container
-		paned_window = ttk.PanedWindow(self.root, orient=tk.HORIZONTAL)
-		paned_window.pack(fill=tk.BOTH, expand=True, padx=15, pady=(0, 15))
+		main_container = tk.Frame(self.root, bg=self.colors['bg_app'])
+		main_container.pack(fill=tk.BOTH, expand=True, padx=30, pady=20)
 
-		# --- LEFT COLUMN ---
-		left_panel = ttk.Frame(paned_window)
+		left_col = tk.Frame(main_container, bg=self.colors['bg_app'], width=400)
+		left_col.pack(side=tk.LEFT, fill=tk.Y, padx=(0, 20))
 
-		# Actions
-		actions_frame = ttk.LabelFrame(left_panel, text=" Pipeline Actions ", style="Card.TLabelframe", padding=15)
-		actions_frame.pack(fill=tk.X, pady=(0, 15))
+		action_frame = ttk.LabelFrame(left_col, text=" Pipeline Actions ", style="Card.TLabelframe", padding=15)
+		action_frame.pack(fill=tk.X, pady=(0, 15))
 
-		act_content = ttk.Frame(actions_frame, style="Panel.TFrame")
-		act_content.pack(fill=tk.BOTH, expand=True)
-
-		self.btn_run_all = ttk.Button(act_content, text="▶ START FULL PIPELINE", style="Primary.TButton", command=lambda: self.start_process("FULL"))
+		self.btn_run_all = ttk.Button(action_frame, text="▶ START FULL PIPELINE", style="Primary.TButton", command=lambda: self.start_process("FULL"))
 		self.btn_run_all.pack(fill=tk.X, pady=(0, 15))
 
-		step_grid = ttk.Frame(act_content, style="Panel.TFrame")
-		step_grid.pack(fill=tk.X)
-		step_grid.columnconfigure(0, weight=1)
-		step_grid.columnconfigure(1, weight=1)
+		step_frame = tk.Frame(action_frame, bg=self.colors['card'])
+		step_frame.pack(fill=tk.X)
+		self.btn_step1 = ttk.Button(step_frame, text="1. Process MPCORB", style="Action.TButton", command=lambda: self.start_process("MPCORB")); self.btn_step1.pack(fill=tk.X, pady=2)
+		self.btn_step2 = ttk.Button(step_frame, text="2. Process NEO", style="Action.TButton", command=lambda: self.start_process("NEO")); self.btn_step2.pack(fill=tk.X, pady=2)
+		self.btn_step3 = ttk.Button(step_frame, text="3. Merge Data", style="Action.TButton", command=lambda: self.start_process("MERGE")); self.btn_step3.pack(fill=tk.X, pady=2)
+		self.btn_step4 = ttk.Button(step_frame, text="4. Import DB", style="Action.TButton", command=lambda: self.start_process("IMPORT")); self.btn_step4.pack(fill=tk.X, pady=2)
 
-		self.btn_step1 = ttk.Button(step_grid, text="1. Process MPCORB", style="Step.TButton", command=lambda: self.start_process("MPCORB"))
-		self.btn_step1.grid(row=0, column=0, sticky="ew", padx=(0, 5), pady=5)
-
-		self.btn_step2 = ttk.Button(step_grid, text="2. Process NEO", style="Step.TButton", command=lambda: self.start_process("NEO"))
-		self.btn_step2.grid(row=0, column=1, sticky="ew", padx=(5, 0), pady=5)
-
-		self.btn_step3 = ttk.Button(step_grid, text="3. Merge Data", style="Step.TButton", command=lambda: self.start_process("MERGE"))
-		self.btn_step3.grid(row=1, column=0, sticky="ew", padx=(0, 5), pady=5)
-
-		self.btn_step4 = ttk.Button(step_grid, text="4. Import DB", style="Step.TButton", command=lambda: self.start_process("IMPORT"))
-		self.btn_step4.grid(row=1, column=1, sticky="ew", padx=(5, 0), pady=5)
-
-		# Options
 		self.use_bulk_var = tk.BooleanVar(value=True)
-		self.chk_bulk = ttk.Checkbutton(act_content, text="Use BULK INSERT (Faster, requires permissions)", variable=self.use_bulk_var, style="TCheckbutton")
-		self.chk_bulk.pack(fill=tk.X, pady=(10, 0))
+		ttk.Checkbutton(action_frame, text="Use BULK INSERT (Faster)", variable=self.use_bulk_var).pack(pady=(10,0))
 
-		# Maintenance
-		maint_frame = ttk.LabelFrame(left_panel, text=" Maintenance ", style="Card.TLabelframe", padding=15)
+		maint_frame = ttk.LabelFrame(left_col, text=" Maintenance ", style="Card.TLabelframe", padding=15)
 		maint_frame.pack(fill=tk.X, pady=(0, 15))
-		maint_content = ttk.Frame(maint_frame, style="Panel.TFrame")
-		maint_content.pack(fill=tk.BOTH)
+		self.btn_clean = ttk.Button(maint_frame, text="🗑 Clean Output Directories", style="Danger.TButton", command=lambda: self.start_process("CLEAN")); self.btn_clean.pack(fill=tk.X, pady=2)
+		self.btn_init_db = ttk.Button(maint_frame, text="⚠ Initialize Database", style="Danger.TButton", command=lambda: self.start_process("INIT_DB")); self.btn_init_db.pack(fill=tk.X, pady=2)
 
-		self.btn_clean = ttk.Button(maint_content, text="🗑 Clean Output Directories", style="Danger.TButton", command=lambda: self.start_process("CLEAN"))
-		self.btn_clean.pack(fill=tk.X, pady=(0, 5))
-
-		self.btn_init_db = ttk.Button(maint_content, text="⚠ Initialize Database (Drop & Recreate)", style="Danger.TButton", command=lambda: self.start_process("INIT_DB"))
-		self.btn_init_db.pack(fill=tk.X)
-
-		# Configuration
-		config_frame = ttk.LabelFrame(left_panel, text=" Configuration (.env) ", style="Card.TLabelframe", padding=15)
+		config_frame = ttk.LabelFrame(left_col, text=" Configuration (.env) ", style="Card.TLabelframe", padding=15)
 		config_frame.pack(fill=tk.BOTH, expand=True)
-		config_content = ttk.Frame(config_frame, style="Panel.TFrame")
-		config_content.pack(fill=tk.BOTH, expand=True)
-
-		self.txt_config = scrolledtext.ScrolledText(config_content, height=8, font=("Consolas", 10), bg=self.colors["text_bg"], fg="#dcdcdc", insertbackground="white", relief="flat", borderwidth=1)
+		self.txt_config = scrolledtext.ScrolledText(config_frame, height=8, font=("Consolas", 9), bg="#1e1e1e", fg="#d4d4d4", insertbackground="white", relief="flat", padx=5, pady=5)
 		self.txt_config.pack(fill=tk.BOTH, expand=True, pady=(0, 10))
+		
+		btn_row = tk.Frame(config_frame, bg=self.colors['card'])
+		btn_row.pack(fill=tk.X)
+		ttk.Button(btn_row, text="💾 Save Changes", style="Action.TButton", command=self.save_env_config).pack(side=tk.RIGHT)
+		ttk.Button(btn_row, text="↻ Reload", command=self.load_env_config).pack(side=tk.RIGHT, padx=5)
 
-		btn_conf_row = ttk.Frame(config_content, style="Panel.TFrame")
-		btn_conf_row.pack(fill=tk.X)
-		ttk.Button(btn_conf_row, text="↻ Reload", command=self.load_env_config).pack(side=tk.LEFT, padx=(0, 5))
-		ttk.Button(btn_conf_row, text="💾 Save Changes", command=self.save_env_config).pack(side=tk.LEFT)
-
-		paned_window.add(left_panel, weight=1)
-
-		# --- RIGHT COLUMN ---
-		right_panel = ttk.LabelFrame(paned_window, text=" System Console ", style="Card.TLabelframe", padding=10)
-
-		self.txt_log = scrolledtext.ScrolledText(right_panel, state='disabled', font=("Consolas", 10), bg=self.colors["text_bg"], fg="#a9b7c6", insertbackground="white", relief="flat", selectbackground="#214283")
+		right_col = ttk.LabelFrame(main_container, text=" System Console ", style="Card.TLabelframe", padding=10)
+		right_col.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
+		self.txt_log = scrolledtext.ScrolledText(right_col, state='disabled', font=("Consolas", 10), bg=self.colors['console_bg'], fg=self.colors['console_fg'], insertbackground="white", relief="flat")
 		self.txt_log.pack(fill=tk.BOTH, expand=True)
 
-		paned_window.add(right_panel, weight=2)
-
-		# --- STATUS BAR ---
-		status_bar = ttk.Frame(self.root, style="Status.TLabel")
-		status_bar.pack(fill=tk.X, side=tk.BOTTOM)
-
 		self.status_var = tk.StringVar(value="Ready")
-		ttk.Label(status_bar, textvariable=self.status_var, background=self.colors["accent"], foreground="white").pack(side=tk.LEFT, padx=10)
-
-		self.progress_bar = ttk.Progressbar(status_bar, mode='indeterminate', length=200)
-		self.progress_bar.pack(side=tk.RIGHT, padx=10, pady=2)
+		status_bar = tk.Frame(self.root, bg=self.colors['accent'], height=30)
+		status_bar.pack(fill=tk.X, side=tk.BOTTOM)
+		tk.Label(status_bar, textvariable=self.status_var, bg=self.colors['accent'], fg="white", font=("Segoe UI", 9, "bold")).pack(side=tk.LEFT, padx=15)
+		self.progress_bar = ttk.Progressbar(status_bar, mode='indeterminate', length=200); self.progress_bar.pack(side=tk.RIGHT, padx=15, pady=5)
 
 	def _poll_queue(self):
 		"""
