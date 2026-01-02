@@ -13,8 +13,14 @@ def main():
 		sys.exit(1)
 
 	try:
+		use_bulk = "--bulk" in sys.argv
+		if use_bulk:
+			print("Mode: BULK INSERT (Fast)")
+		else:
+			print("Mode: STANDARD INSERT (Compatible)")
+
 		importer = DBImporter()
-		importer.run()
+		importer.run(use_bulk=use_bulk)
 	except Exception as e:
 		print(f"\nFatal Error during initialization: {e}")
 		print("Check your connection string in importer/config.py")

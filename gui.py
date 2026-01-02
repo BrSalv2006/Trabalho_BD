@@ -5,7 +5,7 @@ import os
 import queue
 
 # --- WORKER PROCESS (Top-Level) ---
-def run_worker_process(task_name, log_queue, env_vars):
+def run_worker_process(task_name, log_queue, env_vars, use_bulk=False):
 	"""
 	Executes the pipeline logic in a separate system process.
 	This avoids GIL (Global Interpreter Lock) issues, preventing GUI freezes.
@@ -86,7 +86,7 @@ def run_worker_process(task_name, log_queue, env_vars):
 			if 'SQL_CONNECTION_STRING' in os.environ:
 				from importer import config as ImporterConfig
 				ImporterConfig.DB_CONNECTION_STRING = os.environ.get('SQL_CONNECTION_STRING')
-			DBImporter.DBImporter().run()
+			DBImporter.DBImporter().run(use_bulk=use_bulk)
 
 		elif task_name == "INIT_DB":
 			print("\n[Maintenance] Initializing Database...")
@@ -125,7 +125,7 @@ def run_worker_process(task_name, log_queue, env_vars):
 			if 'SQL_CONNECTION_STRING' in os.environ:
 				from importer import config as ImporterConfig
 				ImporterConfig.DB_CONNECTION_STRING = os.environ.get('SQL_CONNECTION_STRING')
-			DBImporter.DBImporter().run()
+			DBImporter.DBImporter().run(use_bulk=use_bulk)
 
 			end_time = time.time()
 			duration = end_time - start_time
@@ -194,6 +194,8 @@ class AsteroidPipelineApp:
 		style.configure("Panel.TFrame", background=self.colors["panel"])
 
 		style.configure("TButton", padding=8, relief="flat", borderwidth=0, font=("Segoe UI", 9, "bold"))
+		style.configure("TCheckbutton", background=self.colors["panel"], foreground=self.colors["fg"], font=("Segoe UI", 9))
+		style.map("TCheckbutton", background=[('active', self.colors["panel"])])
 		style.configure("Primary.TButton", background=self.colors["success"], foreground="white", font=("Segoe UI", 12, "bold"))
 		style.map("Primary.TButton", background=[('active', '#4caf50'), ('disabled', '#2e5c31')])
 
@@ -245,6 +247,11 @@ class AsteroidPipelineApp:
 
 		self.btn_step4 = ttk.Button(step_grid, text="4. Import DB", style="Step.TButton", command=lambda: self.start_process("IMPORT"))
 		self.btn_step4.grid(row=1, column=1, sticky="ew", padx=(5, 0), pady=5)
+
+		# Options
+		self.use_bulk_var = tk.BooleanVar(value=False)
+		self.chk_bulk = ttk.Checkbutton(act_content, text="Use BULK INSERT (Faster, requires permissions)", variable=self.use_bulk_var, style="TCheckbutton")
+		self.chk_bulk.pack(fill=tk.X, pady=(10, 0))
 
 		# Maintenance
 		maint_frame = ttk.LabelFrame(left_panel, text=" Maintenance ", style="Card.TLabelframe", padding=15)
@@ -421,11 +428,12 @@ class AsteroidPipelineApp:
 
 		# Prepare Env
 		current_env = os.environ.copy()
+		use_bulk = self.use_bulk_var.get()
 
 		# Spawn Process
 		self.current_process = multiprocessing.Process(
 			target=run_worker_process,
-			args=(task_name, self.log_queue, current_env)
+			args=(task_name, self.log_queue, current_env, use_bulk)
 		)
 		self.current_process.start()
 
