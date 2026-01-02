@@ -6,7 +6,7 @@ SELECT
 GO
 
 CREATE OR ALTER VIEW vw_ProximosEventosCriticos AS
-SELECT TOP 1
+SELECT TOP 5
 	o.tp AS Data_Proxima_Aproximacao,
 	a.name AS Nome,
 	a.pdes as Designacao_Provisoria,
@@ -30,69 +30,57 @@ WHERE a.neo = 1
 GO
 
 CREATE OR ALTER VIEW vw_EvolucaoPrecisao AS
-SELECT
+SELECT TOP 1000
 	YEAR(epoch) AS Ano,
 	AVG(rms) AS rms_medio
 FROM Orbita
 WHERE epoch IS NOT NULL
-GROUP BY YEAR(epoch);
+GROUP BY YEAR(epoch)
+ORDER BY Ano ASC;
 GO
 
 CREATE OR ALTER VIEW vw_Last5Detected AS
 SELECT TOP 5
-	a.IDAsteroide,
-	a.spkid,
-	a.pdes,
-	a.name,
-	a.diameter,
-	a.pha,
-	a.neo,
-	o.epoch AS data_referencia,
-	o.moid_ld
+	a.IDAsteroide AS IDAsteroide,
+	a.pdes AS Designacao_Provisoria,
+	a.name AS Nome,
+	o.epoch AS Data_Deteccao
 FROM Asteroide a
 JOIN Orbita o ON a.IDAsteroide = o.IDAsteroide
-ORDER BY a.IDAsteroide DESC;
+ORDER BY o.epoch DESC;
 GO
 
 CREATE OR ALTER VIEW vw_PHA_NEO AS
 SELECT
-	a.IDAsteroide,
-	a.spkid,
-	a.pdes,
-	a.name,
-	a.diameter,
-	a.H AS magnitude_absoluta,
-	o.moid_ld,
-	o.rms
+	a.IDAsteroide AS IDAsteroide,
+	a.pdes AS Designacao_Provisoria,
+	a.name AS Nome,
+	a.neo AS NEO,
+	a.pha AS PHA
 FROM Asteroide a
-JOIN Orbita o ON a.IDAsteroide = o.IDAsteroide
 WHERE a.neo = 1 AND a.pha = 1;
 GO
 
 CREATE OR ALTER VIEW vw_TopCenters AS
 SELECT TOP 10
-	c.Nome AS Centro,
-	c.Localizacao,
-	COUNT(o.IDObservacao) AS total_observacoes
-	FROM Centro_de_observacao c
-	JOIN Equipamento e ON c.IDCentro = e.IDCentro
-	JOIN Observacao o ON e.IDEquipamento = o.IDEquipamento
-	GROUP BY c.Nome, c.Localizacao
-	ORDER BY total_observacoes DESC;
-	GO
+	c.IDCentro AS IDCentro,
+	c.Nome AS Nome,
+	c.Localizacao AS Localizacao,
+	COUNT(DISTINCT o.IDObservacao) AS total_observacoes
+FROM Centro_de_observacao c
+JOIN Equipamento e ON c.IDCentro = e.IDCentro
+JOIN Observacao o ON o.IDEquipamento = e.IDEquipamento
+GROUP BY c.IDCentro, c.Nome, c.Localizacao
+ORDER BY total_observacoes DESC;
+GO
 
 CREATE OR ALTER VIEW vw_LargestPHAs AS
 SELECT TOP 20
-	a.IDAsteroide,
-	a.spkid,
-	a.pdes,
-	a.name,
-	a.diameter,
-	a.albedo,
-	o.moid_ld,
-	o.tp AS data_perielio
+	a.IDAsteroide AS IDAsteroide,
+	a.pdes AS Designacao_Provisoria,
+	a.name AS Nome,
+	a.diameter AS Diametro
 FROM Asteroide a
-JOIN Orbita o ON a.IDAsteroide = o.IDAsteroide
 WHERE a.pha = 1
 ORDER BY a.diameter DESC;
 GO
