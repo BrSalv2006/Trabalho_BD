@@ -1,13 +1,13 @@
 CREATE TABLE Classe (
 	IDClasse INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
 	Descricao VARCHAR(255),
-	CodClasse VARCHAR(50)
+	CodClasse VARCHAR(50) UNIQUE
 );
 GO
 
 CREATE TABLE Software (
 	IDSoftware INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
-	Nome VARCHAR(100)
+	Nome VARCHAR(100) UNIQUE
 );
 GO
 
@@ -36,8 +36,9 @@ CREATE TABLE Asteroide (
 GO
 
 CREATE UNIQUE NONCLUSTERED INDEX IX_Asteroide_spkid ON Asteroide(spkid) WHERE spkid IS NOT NULL;
-CREATE INDEX IX_Asteroide_pdes ON Asteroide(pdes);
-CREATE INDEX IX_Asteroide_number ON Asteroide(number) WHERE number IS NOT NULL;
+CREATE UNIQUE NONCLUSTERED INDEX IX_Asteroide_pdes ON Asteroide(pdes) WHERE pdes IS NOT NULL;
+CREATE UNIQUE NONCLUSTERED INDEX IX_Asteroide_number ON Asteroide(number) WHERE number IS NOT NULL;
+CREATE NONCLUSTERED INDEX IX_Asteroide_name ON Asteroide(name) WHERE name IS NOT NULL;
 CREATE INDEX IX_Asteroide_Flags ON Asteroide(pha, neo) INCLUDE (diameter, H);
 GO
 

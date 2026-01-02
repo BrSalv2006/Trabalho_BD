@@ -330,7 +330,7 @@ class AsteroidProcessor:
 		df_obs['Data_atualizacao'] = chunk['epoch_iso']
 		df_obs['Hora'] = ""
 		df_obs['Duracao'] = ""
-		df_obs['Modo'] = "Orbit Computation"
+		df_obs['Modo'] = np.where(df_obs['IDSoftware'] != "", "Orbit Computation", np.where(df_obs['IDAstronomo'] != "", "Orbit Sighting", ""))
 		df_obs = df_obs[SCHEMAS['mpcorb_observations.csv']]
 		df_obs.to_csv(self.file_handles['mpcorb_observations.csv'], mode='a', header=False, index=False)
 

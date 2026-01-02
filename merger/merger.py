@@ -61,6 +61,41 @@ class DataMerger:
 		self._save(out_df, FILES['classes'])
 		print(f"Merged Classes saved: {len(out_df)}")
 
+	def _normalize_identifiers(self, df1: pd.DataFrame, df2: pd.DataFrame):
+		"""
+		Fills missing 'number' values in both dataframes by matching 'pdes'.
+		"""
+		# Create temporary clean columns for matching
+		pdes_col = '_temp_pdes'
+		num_col = '_temp_number'
+		
+		for df in [df1, df2]:
+			df[pdes_col] = df['pdes'].fillna("").astype(str).str.strip().str.upper()
+			df[num_col] = df['number'].fillna("").astype(str).str.strip().str.lstrip('0')
+		
+		# Build mapping from both, prioritizing df1 (MPC)
+		combined = pd.concat([df1[[pdes_col, num_col]], df2[[pdes_col, num_col]]])
+		
+		# Valid: pdes not empty, number not empty
+		valid = combined[(combined[pdes_col] != "") & (combined[num_col] != "")]
+		
+		# pdes -> number map
+		pdes_map = valid.drop_duplicates(subset=[pdes_col]).set_index(pdes_col)[num_col].to_dict()
+		
+		# Apply map
+		def apply_map(df):
+			# Mask: number is empty AND pdes is in map
+			mask = (df[num_col] == "") & (df[pdes_col].isin(pdes_map))
+			if mask.any():
+				df.loc[mask, 'number'] = df.loc[mask, pdes_col].map(pdes_map)
+			
+			return df.drop(columns=[pdes_col, num_col])
+
+		df1 = apply_map(df1)
+		df2 = apply_map(df2)
+		
+		return df1, df2
+
 	def merge_asteroids(self):
 		print("Merging Asteroids tables...")
 
@@ -74,6 +109,8 @@ class DataMerger:
 		# Normalize columns if missing in NEO
 		if df_neo.empty:
 			df_neo = pd.DataFrame(columns=df_mpc.columns)
+
+		df_mpc, df_neo = self._normalize_identifiers(df_mpc, df_neo)
 
 		# Vectorized Key Generation
 		df_mpc['match_key'] = self._create_match_key(df_mpc)
