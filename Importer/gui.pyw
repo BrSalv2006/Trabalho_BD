@@ -10,6 +10,9 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 if BASE_DIR not in sys.path:
 	sys.path.insert(0, BASE_DIR)
 
+# Project Root (Parent of Importer)
+PROJECT_ROOT = os.path.dirname(BASE_DIR)
+
 # --- WORKER PROCESS (Top-Level) ---
 def run_worker_process(task_name, log_queue, env_vars, use_bulk=False):
 	"""
@@ -353,7 +356,7 @@ class AsteroidPipelineApp:
 
 	# --- Config ---
 	def load_env_config(self):
-		env_path = os.path.join(BASE_DIR, '.env')
+		env_path = os.path.join(PROJECT_ROOT, '.env')
 		if os.path.exists(env_path):
 			with open(env_path, 'r') as f:
 				content = f.read()
@@ -364,7 +367,7 @@ class AsteroidPipelineApp:
 			self.log_message(f"[WARN] .env file not found at {env_path}")
 
 	def save_env_config(self):
-		env_path = os.path.join(BASE_DIR, '.env')
+		env_path = os.path.join(PROJECT_ROOT, '.env')
 		content = self.txt_config.get("1.0", tk.END).strip()
 		try:
 			with open(env_path, 'w') as f:

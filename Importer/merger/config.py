@@ -6,8 +6,7 @@ import os
 csv.field_size_limit(sys.maxsize)
 
 # --- File Paths ---
-# Determine the project root directory (2 levels up from this file)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 DIR_MPC = os.path.join(BASE_DIR, 'output_tables_mpcorb')
 DIR_NEO = os.path.join(BASE_DIR, 'output_tables_neo')

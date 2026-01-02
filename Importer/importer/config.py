@@ -1,8 +1,7 @@
 import os
 from dotenv import load_dotenv
 
-# Determine the project root directory (2 levels up from this file)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # --- Database Connection ---
 load_dotenv(os.path.join(BASE_DIR, '.env'))
