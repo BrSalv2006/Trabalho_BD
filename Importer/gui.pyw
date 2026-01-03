@@ -269,7 +269,7 @@ class AsteroidPipelineApp:
 		This is the Main Thread side of the communication.
 		"""
 		try:
-			# Fetch up to 500 messages to update UI without freezing
+			# Fetch all messages to update UI
 			messages = []
 			while not self.log_queue.empty():
 				try:
@@ -278,7 +278,6 @@ class AsteroidPipelineApp:
 						self._on_process_finished()
 						continue
 					messages.append(msg)
-					if len(messages) > 500: break
 				except queue.Empty:
 					break
 
