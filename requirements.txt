@@ -2,3 +2,4 @@ pandas
 numpy
 mssql-python
 python-dotenv
+matplotlib

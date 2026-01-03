@@ -1,0 +1,1629 @@
+{
+  "diagramType": 2,
+  "data": {
+    "nodes": [
+      {
+        "id": "4af4f8a9-91de-4f1b-8ac3-b7dddfe5b6d2",
+        "type": "Table",
+        "position": {
+          "x": -645.6637629492471,
+          "y": 707.8371392017872
+        },
+        "data": {
+          "label": "Classe",
+          "isConnectable": false,
+          "columns": [
+            {
+              "id": "41bd47e4-03b1-4b56-afb4-80fa3ce9729e",
+              "name": "IDClasse",
+              "type": "INT",
+              "position": 0,
+              "isPrimaryKey": true,
+              "isOptional": false,
+              "isUnique": false,
+              "size": ""
+            },
+            {
+              "id": "28b40da1-63e1-4c6f-b946-cd8fe6921f5c",
+              "name": "Descricao",
+              "type": "VARCHAR(n)",
+              "position": 1,
+              "isPrimaryKey": false,
+              "isOptional": true,
+              "isUnique": false,
+              "size": "255"
+            },
+            {
+              "id": "c43fbd0f-7bb5-4ee9-9784-8f09109888dc",
+              "name": "CodClasse",
+              "type": "VARCHAR(n)",
+              "position": 2,
+              "isPrimaryKey": false,
+              "isOptional": false,
+              "isUnique": true,
+              "size": "50"
+            }
+          ],
+          "isSelected": false
+        },
+        "measured": {
+          "width": 240,
+          "height": 101
+        },
+        "selected": false,
+        "dragging": false
+      },
+      {
+        "id": "240e9093-7f82-434b-a88e-72c33118027f",
+        "type": "Table",
+        "position": {
+          "x": -41.94192806577709,
+          "y": 160.64730935525904
+        },
+        "data": {
+          "label": "Software",
+          "isConnectable": false,
+          "columns": [
+            {
+              "id": "9e464270-6548-4f8c-b594-fbb7c3838fa1",
+              "name": "IDSoftware",
+              "type": "INT",
+              "position": 0,
+              "isPrimaryKey": true,
+              "isOptional": false,
+              "isUnique": false,
+              "size": ""
+            },
+            {
+              "id": "d03321bd-4ee7-4992-a5f8-77b30605a544",
+              "name": "Nome",
+              "type": "VARCHAR(n)",
+              "position": 1,
+              "isPrimaryKey": false,
+              "isOptional": false,
+              "isUnique": true,
+              "size": "100"
+            }
+          ],
+          "isSelected": false
+        },
+        "measured": {
+          "width": 240,
+          "height": 76
+        },
+        "selected": false,
+        "dragging": false
+      },
+      {
+        "id": "e98d06f7-81f1-4f36-8471-d259eac48d29",
+        "type": "Table",
+        "position": {
+          "x": 263.2152375993268,
+          "y": 178.8359081533838
+        },
+        "data": {
+          "label": "Centro_de_observacao",
+          "isConnectable": false,
+          "columns": [
+            {
+              "id": "d3bb25c9-4ab2-432d-b65a-6116f95f2990",
+              "name": "IDCentro",
+              "type": "INT",
+              "position": 0,
+              "isPrimaryKey": true,
+              "isOptional": false,
+              "isUnique": false,
+              "size": ""
+            },
+            {
+              "id": "b1920000-0b1a-4f37-a88c-8c630f9059f8",
+              "name": "Nome",
+              "type": "VARCHAR(n)",
+              "position": 1,
+              "isPrimaryKey": false,
+              "isOptional": false,
+              "isUnique": true,
+              "size": "100"
+            },
+            {
+              "id": "688d571b-4ea2-4b04-ba29-63009b87d23a",
+              "name": "Localizacao",
+              "type": "VARCHAR(n)",
+              "position": 2,
+              "isPrimaryKey": false,
+              "isOptional": true,
+              "isUnique": false,
+              "size": "100"
+            }
+          ],
+          "isSelected": false
+        },
+        "measured": {
+          "width": 240,
+          "height": 101
+        },
+        "selected": false,
+        "dragging": false
+      },
+      {
+        "id": "018c88fd-f9ef-4b31-a990-d164a869fd2b",
+        "type": "Table",
+        "position": {
+          "x": -648.6779253924628,
+          "y": -12.66441492150733
+        },
+        "data": {
+          "label": "Asteroide",
+          "isConnectable": false,
+          "columns": [
+            {
+              "id": "28ed703f-732c-4444-bb31-b90ae77f013a",
+              "name": "IDAsteroide",
+              "type": "INT",
+              "position": 0,
+              "isPrimaryKey": true,
+              "isOptional": false,
+              "isUnique": false,
+              "size": ""
+            },
+            {
+              "id": "b01a9bcc-cf7c-483e-bc85-3b9acab0f8af",
+              "name": "number",
+              "type": "INT",
+              "position": 1,
+              "isPrimaryKey": false,
+              "isOptional": true,
+              "isUnique": true,
+              "size": ""
+            },
+            {
+              "id": "1bd711ef-5df4-4527-ae05-8402ddfad8fa",
+              "name": "spkid",
+              "type": "VARCHAR(n)",
+              "position": 2,
+              "isPrimaryKey": false,
+              "isOptional": true,
+              "isUnique": true,
+              "size": "20"
+            },
+            {
+              "id": "bc7d8a87-b8e0-44d8-aa93-309864108e55",
+              "name": "pdes",
+              "type": "VARCHAR(n)",
+              "position": 3,
+              "isPrimaryKey": false,
+              "isOptional": true,
+              "isUnique": true,
+              "size": "20"
+            },
+            {
+              "id": "18edbfbd-e3dc-418c-9ba3-13e985d4308d",
+              "name": "name",
+              "type": "VARCHAR(n)",
+              "position": 4,
+              "isPrimaryKey": false,
+              "isOptional": true,
+              "isUnique": false,
+              "size": "100"
+            },
+            {
+              "id": "91eeff33-34eb-4d19-9c85-cb2eaf1b2f8e",
+              "name": "prefix",
+              "type": "VARCHAR(n)",
+              "position": 5,
+              "isPrimaryKey": false,
+              "isOptional": true,
+              "isUnique": false,
+              "size": "10"
+            },
+            {
+              "id": "bbc50624-0135-4a27-a812-3086b6c00468",
+              "name": "neo",
+              "type": "Custom",
+              "position": 6,
+              "isPrimaryKey": false,
+              "isOptional": false,
+              "isUnique": false,
+              "size": "BIT"
+            },
+            {
+              "id": "a2952ee6-49ff-4507-a402-d665f8b57e0e",
+              "name": "pha",
+              "type": "Custom",
+              "position": 7,
+              "isPrimaryKey": false,
+              "isOptional": false,
+              "isUnique": false,
+              "size": "BIT"
+            },
+            {
+              "id": "a7f02ce2-6f6e-414d-ad07-84fd67c4c133",
+              "name": "H",
+              "type": "NUMERIC(p s)",
+              "position": 8,
+              "isPrimaryKey": false,
+              "isOptional": true,
+              "isUnique": false,
+              "size": "10,5"
+            },
+            {
+              "id": "56b55059-4c4b-4712-8cc5-acde028e1380",
+              "name": "G",
+              "type": "NUMERIC(p s)",
+              "position": 9,
+              "isPrimaryKey": false,
+              "isOptional": true,
+              "isUnique": false,
+              "size": "10,5"
+            },
+            {
+              "id": "c5f16a8a-8947-427f-9844-d6649483cbae",
+              "name": "diameter",
+              "type": "NUMERIC(p s)",
+              "position": 10,
+              "isPrimaryKey": false,
+              "isOptional": true,
+              "isUnique": false,
+              "size": "10,5"
+            },
+            {
+              "id": "c4e56279-6c71-42ca-9c49-e9b04964c259",
+              "name": "diameter_sigma",
+              "type": "NUMERIC(p s)",
+              "position": 11,
+              "isPrimaryKey": false,
+              "isOptional": true,
+              "isUnique": false,
+              "size": "10,5"
+            },
+            {
+              "id": "8bfeae58-4054-4cbd-bff0-9b2137bf378d",
+              "name": "albedo",
+              "type": "NUMERIC(p s)",
+              "position": 12,
+              "isPrimaryKey": false,
+              "isOptional": true,
+              "isUnique": false,
+              "size": "10,5"
+            }
+          ],
+          "isSelected": false
+        },
+        "measured": {
+          "width": 240,
+          "height": 351
+        },
+        "selected": false,
+        "dragging": false
+      },
+      {
+        "id": "c3d19a92-7fb1-470d-8107-edf97b0ee945",
+        "type": "Table",
+        "position": {
+          "x": -41.94192806577706,
+          "y": -26.451784375622033
+        },
+        "data": {
+          "label": "Astronomo",
+          "isConnectable": false,
+          "columns": [
+            {
+              "id": "6b01e800-e341-4b65-8462-44f9eb6cd70a",
+              "name": "IDAstronomo",
+              "type": "INT",
+              "position": 0,
+              "isPrimaryKey": true,
+              "isOptional": false,
+              "isUnique": false,
+              "size": ""
+            },
+            {
+              "id": "8b477b3c-a486-4ab5-9124-595984eaf4a9",
+              "name": "Nome",
+              "type": "VARCHAR(n)",
+              "position": 1,
+              "isPrimaryKey": false,
+              "isOptional": false,
+              "isUnique": false,
+              "size": "100"
+            },
+            {
+              "id": "fk_1e4deba4-a8c6-4cef-a996-27578bd946c9",
+              "name": "fk_Centro_de_observacao",
+              "type": "None",
+              "isForeignKey": true,
+              "foreignKeyProps": {
+                "foreignKeyGroupId": "11515335-84f2-4d23-96d8-03b538e0c815",
+                "sourceTableId": "e98d06f7-81f1-4f36-8471-d259eac48d29",
+                "columns": [
+                  {
+                    "id": "fk_d3bb25c9-4ab2-432d-b65a-6116f95f2990",
+                    "name": "IDCentro",
+                    "type": "INT",
+                    "size": ""
+                  }
+                ]
+              }
+            }
+          ],
+          "isSelected": false
+        },
+        "measured": {
+          "width": 240,
+          "height": 102
+        },
+        "selected": false,
+        "dragging": false
+      },
+      {
+        "id": "c87f808b-985c-48c4-974e-b4ba518d5a78",
+        "type": "Table",
+        "position": {
+          "x": -41.69147768711498,
+          "y": 337.2918835178643
+        },
+        "data": {
+          "label": "Equipamento",
+          "isConnectable": false,
+          "columns": [
+            {
+              "id": "f41b8376-6f59-41e5-9b94-e5ead76e38cb",
+              "name": "IDEquipamento",
+              "type": "INT",
+              "position": 0,
+              "isPrimaryKey": true,
+              "isOptional": false,
+              "isUnique": false,
+              "size": ""
+            },
+            {
+              "id": "9b408cec-ca54-4c58-bfdf-faff0ea48a62",
+              "name": "Nome",
+              "type": "VARCHAR(n)",
+              "position": 1,
+              "isPrimaryKey": false,
+              "isOptional": false,
+              "isUnique": false,
+              "size": "100"
+            },
+            {
+              "id": "a68ddbfe-980a-4ab5-ab98-4ee96f812232",
+              "name": "Tipo",
+              "type": "VARCHAR(n)",
+              "position": 2,
+              "isPrimaryKey": false,
+              "isOptional": false,
+              "isUnique": false,
+              "size": "50"
+            },
+            {
+              "id": "fk_84b349fa-cdd2-4446-b31e-ebe0071ce95e",
+              "name": "fk_Centro_de_observacao",
+              "type": "None",
+              "isForeignKey": true,
+              "foreignKeyProps": {
+                "foreignKeyGroupId": "19121890-debc-4095-b196-92e20065cf7c",
+                "sourceTableId": "e98d06f7-81f1-4f36-8471-d259eac48d29",
+                "columns": [
+                  {
+                    "id": "fk_d3bb25c9-4ab2-432d-b65a-6116f95f2990",
+                    "name": "IDCentro",
+                    "type": "INT",
+                    "size": ""
+                  }
+                ]
+              }
+            }
+          ],
+          "isSelected": false
+        },
+        "measured": {
+          "width": 240,
+          "height": 127
+        },
+        "selected": false,
+        "dragging": false
+      },
+      {
+        "id": "de1da1a8-0e1c-494b-997c-a305a1661aae",
+        "type": "Table",
+        "position": {
+          "x": -966.7951127314434,
+          "y": -167.51896976973416
+        },
+        "data": {
+          "label": "Orbita",
+          "isConnectable": false,
+          "columns": [
+            {
+              "id": "5dbda2f3-1374-4d00-a740-93097a61dc08",
+              "name": "IDOrbita",
+              "type": "INT",
+              "position": 0,
+              "isPrimaryKey": true,
+              "isOptional": false,
+              "isUnique": false,
+              "size": ""
+            },
+            {
+              "id": "7a4d8fe0-99e4-4c2e-8939-e0ff89f32c00",
+              "name": "epoch",
+              "type": "DATE",
+              "position": 1,
+              "isPrimaryKey": false,
+              "isOptional": true,
+              "isUnique": false,
+              "size": "",
+              "groupNumbers": [
+                1
+              ]
+            },
+            {
+              "id": "20ab127b-016c-4519-91a3-9b397cd361ce",
+              "name": "e",
+              "type": "NUMERIC(p s)",
+              "position": 2,
+              "isPrimaryKey": false,
+              "isOptional": true,
+              "isUnique": false,
+              "size": "20,10"
+            },
+            {
+              "id": "0640720e-b982-40bd-bff8-08153add9a8d",
+              "name": "sigma_e",
+              "type": "NUMERIC(p s)",
+              "position": 3,
+              "size": "30,10",
+              "isOptional": true
+            },
+            {
+              "id": "3dd4f1ea-f084-474b-8123-f3ef578dc90f",
+              "name": "a",
+              "type": "NUMERIC(p s)",
+              "position": 4,
+              "isPrimaryKey": false,
+              "isOptional": true,
+              "isUnique": false,
+              "size": "30,10"
+            },
+            {
+              "id": "06d9203e-f165-47d7-8cd0-561b8daf8388",
+              "name": "sigma_a",
+              "type": "NUMERIC(p s)",
+              "position": 5,
+              "size": "30,10",
+              "isOptional": true
+            },
+            {
+              "id": "e025fd71-899d-4233-a5c3-e8ef36b13bc8",
+              "name": "q",
+              "type": "NUMERIC(p s)",
+              "position": 6,
+              "isPrimaryKey": false,
+              "isOptional": true,
+              "isUnique": false,
+              "size": "30,10"
+            },
+            {
+              "id": "80bdc1df-caf0-40fe-83ba-02b8aa245da3",
+              "name": "sigma_q",
+              "type": "NUMERIC(p s)",
+              "position": 7,
+              "size": "30,10",
+              "isOptional": true
+            },
+            {
+              "id": "df8bf117-a169-41e1-84f4-cc40cd7a25e7",
+              "name": "i",
+              "type": "NUMERIC(p s)",
+              "position": 8,
+              "isPrimaryKey": false,
+              "isOptional": true,
+              "isUnique": false,
+              "size": "20,10"
+            },
+            {
+              "id": "bd9c6b51-82ac-4c51-9188-310dc0a97c22",
+              "name": "sigma_i",
+              "type": "NUMERIC(p s)",
+              "position": 9,
+              "size": "30,10",
+              "isOptional": true
+            },
+            {
+              "id": "b5db4575-ba45-4c58-a727-373b6485eb0a",
+              "name": "om",
+              "type": "NUMERIC(p s)",
+              "position": 10,
+              "isPrimaryKey": false,
+              "isOptional": true,
+              "isUnique": false,
+              "size": "20,10"
+            },
+            {
+              "id": "ed1be4c0-0e2e-4434-abf8-b43508e602fb",
+              "name": "sigma_om",
+              "type": "NUMERIC(p s)",
+              "position": 11,
+              "size": "30,10",
+              "isOptional": true
+            },
+            {
+              "id": "854d20a1-bfef-4d55-af1e-4578b42c64ed",
+              "name": "w",
+              "type": "NUMERIC(p s)",
+              "position": 12,
+              "isPrimaryKey": false,
+              "isOptional": true,
+              "isUnique": false,
+              "size": "20,10"
+            },
+            {
+              "id": "e1c01676-cabd-438b-a0d3-9fd6090f2282",
+              "name": "sigma_w",
+              "type": "NUMERIC(p s)",
+              "position": 13,
+              "size": "30,10",
+              "isOptional": true
+            },
+            {
+              "id": "4b941cd5-c139-4511-a91f-86df17c45e93",
+              "name": "ma",
+              "type": "NUMERIC(p s)",
+              "position": 14,
+              "isPrimaryKey": false,
+              "isOptional": true,
+              "isUnique": false,
+              "size": "20,10"
+            },
+            {
+              "id": "ebc12881-1efc-467a-abf7-46f5ea6b395e",
+              "name": "sigma_ma",
+              "type": "NUMERIC(p s)",
+              "position": 15,
+              "size": "30,10",
+              "isOptional": true
+            },
+            {
+              "id": "e632da54-5ef9-49bf-8c73-3cf61587021a",
+              "name": "ad",
+              "type": "NUMERIC(p s)",
+              "position": 16,
+              "isPrimaryKey": false,
+              "isOptional": true,
+              "isUnique": false,
+              "size": "30,10"
+            },
+            {
+              "id": "12b14f2f-643b-4b03-890c-68921e4da158",
+              "name": "sigma_ad",
+              "type": "NUMERIC(p s)",
+              "position": 17,
+              "size": "30,10",
+              "isOptional": true
+            },
+            {
+              "id": "b00d2214-f0ec-4136-8471-a3eaa7bf3a4b",
+              "name": "n",
+              "type": "NUMERIC(p s)",
+              "position": 18,
+              "isPrimaryKey": false,
+              "isOptional": true,
+              "isUnique": false,
+              "size": "20,10"
+            },
+            {
+              "id": "1897007c-bc12-4d3f-9d06-989303b675ce",
+              "name": "sigma_n",
+              "type": "NUMERIC(p s)",
+              "position": 19,
+              "size": "30,10",
+              "isOptional": true
+            },
+            {
+              "id": "22b484b2-5984-4e47-9a3b-8c464ec050ca",
+              "name": "tp",
+              "type": "Custom",
+              "position": 20,
+              "isPrimaryKey": false,
+              "isOptional": true,
+              "isUnique": false,
+              "size": "DATETIME2(7)"
+            },
+            {
+              "id": "2f9ec27e-99ab-4703-a0b6-2ca89d311135",
+              "name": "sigma_tp",
+              "type": "NUMERIC(p s)",
+              "position": 21,
+              "size": "30,10",
+              "isOptional": true
+            },
+            {
+              "id": "115f93f0-5d25-449c-b123-e2527e9b10b8",
+              "name": "per",
+              "type": "NUMERIC(p s)",
+              "position": 22,
+              "isPrimaryKey": false,
+              "isOptional": true,
+              "isUnique": false,
+              "size": "30,10"
+            },
+            {
+              "id": "e652d4ef-7754-45e9-9fba-d3795617aa48",
+              "name": "sigma_per",
+              "type": "NUMERIC(p s)",
+              "position": 23,
+              "size": "30,10",
+              "isOptional": true
+            },
+            {
+              "id": "7271c92d-6db1-4a6a-8d0a-62497f5d3fa7",
+              "name": "moid",
+              "type": "NUMERIC(p s)",
+              "position": 24,
+              "isPrimaryKey": false,
+              "isOptional": true,
+              "isUnique": false,
+              "size": "20,10"
+            },
+            {
+              "id": "2dffcabd-2f9d-4f02-86dc-052d1cdbd8ba",
+              "name": "moid_ld",
+              "type": "NUMERIC(p s)",
+              "position": 25,
+              "isPrimaryKey": false,
+              "isOptional": true,
+              "isUnique": false,
+              "size": "20,10"
+            },
+            {
+              "id": "c13e0ca2-e0ce-49f8-83af-6ac66fe9a067",
+              "name": "rms",
+              "type": "NUMERIC(p s)",
+              "position": 26,
+              "isPrimaryKey": false,
+              "isOptional": true,
+              "isUnique": false,
+              "size": "10,5"
+            },
+            {
+              "id": "ba3177c3-7d7e-4ddc-9927-9398b3812c4a",
+              "name": "uncertainty",
+              "type": "VARCHAR(n)",
+              "position": 27,
+              "isPrimaryKey": false,
+              "isOptional": true,
+              "isUnique": false,
+              "size": "10"
+            },
+            {
+              "id": "4d07cc18-bce3-4965-bdc7-8f72b8f99fa2",
+              "name": "Reference",
+              "type": "VARCHAR(n)",
+              "position": 28,
+              "isPrimaryKey": false,
+              "isOptional": true,
+              "isUnique": false,
+              "size": "50"
+            },
+            {
+              "id": "9f738bab-aad1-4b30-8c12-60801e207a8e",
+              "name": "Num_Obs",
+              "type": "INT",
+              "position": 29,
+              "isPrimaryKey": false,
+              "isOptional": true,
+              "isUnique": false,
+              "size": ""
+            },
+            {
+              "id": "1c0118b6-806c-4c17-a8bf-08ef3e345bc3",
+              "name": "Num_Opp",
+              "type": "INT",
+              "position": 30,
+              "isPrimaryKey": false,
+              "isOptional": true,
+              "isUnique": false,
+              "size": ""
+            },
+            {
+              "id": "df1471de-3f17-47a5-9a64-721e945988ab",
+              "name": "Arc",
+              "type": "VARCHAR(n)",
+              "position": 31,
+              "isPrimaryKey": false,
+              "isOptional": true,
+              "isUnique": false,
+              "size": "20"
+            },
+            {
+              "id": "b2f94140-fa92-4dcd-aebf-b9900f203962",
+              "name": "Coarse_Perts",
+              "type": "VARCHAR(n)",
+              "position": 32,
+              "isPrimaryKey": false,
+              "isOptional": true,
+              "isUnique": false,
+              "size": "20"
+            },
+            {
+              "id": "ca093265-308c-4b95-a226-b85af74bc5ec",
+              "name": "Precise_Perts",
+              "type": "VARCHAR(n)",
+              "position": 33,
+              "isPrimaryKey": false,
+              "isOptional": true,
+              "isUnique": false,
+              "size": "20"
+            },
+            {
+              "id": "fk_df4558e5-fea8-4b79-abc9-ebd4d7d4b53e",
+              "name": "fk_Asteroide",
+              "type": "None",
+              "isForeignKey": true,
+              "foreignKeyProps": {
+                "foreignKeyGroupId": "aa738f7a-e7f2-4436-bf9d-fff1f7b32976",
+                "sourceTableId": "018c88fd-f9ef-4b31-a990-d164a869fd2b",
+                "columns": [
+                  {
+                    "id": "fk_28ed703f-732c-4444-bb31-b90ae77f013a",
+                    "name": "IDAsteroide",
+                    "type": "INT",
+                    "size": ""
+                  }
+                ]
+              },
+              "position": 34,
+              "groupNumbers": [
+                1
+              ],
+              "isOptional": false
+            },
+            {
+              "id": "fk_28b05285-a591-4124-b4bd-248210373a34",
+              "name": "fk_Classe",
+              "type": "None",
+              "isForeignKey": true,
+              "foreignKeyProps": {
+                "foreignKeyGroupId": "82968258-fbec-43c9-9df8-ee5986f5772d",
+                "sourceTableId": "4af4f8a9-91de-4f1b-8ac3-b7dddfe5b6d2",
+                "columns": [
+                  {
+                    "id": "fk_41bd47e4-03b1-4b56-afb4-80fa3ce9729e",
+                    "name": "IDClasse",
+                    "type": "INT",
+                    "size": ""
+                  }
+                ]
+              },
+              "position": 35,
+              "isOptional": false
+            }
+          ],
+          "isSelected": false
+        },
+        "measured": {
+          "width": 253,
+          "height": 927
+        },
+        "selected": false,
+        "dragging": false
+      },
+      {
+        "id": "59da85e2-25b0-4675-95e8-e17c4959adef",
+        "type": "Table",
+        "position": {
+          "x": -343.8195317352392,
+          "y": -14.041476267681333
+        },
+        "data": {
+          "label": "Observacao",
+          "isConnectable": false,
+          "columns": [
+            {
+              "id": "a75c5257-4a9c-455e-9a3c-82ed3ba8252a",
+              "name": "IDObservacao",
+              "type": "INT",
+              "position": 0,
+              "isPrimaryKey": true,
+              "isOptional": false,
+              "isUnique": false,
+              "size": ""
+            },
+            {
+              "id": "d3fb58d0-031a-4a32-be0f-4f6b14d7e2bb",
+              "name": "Data_atualizacao",
+              "type": "DATE",
+              "position": 1,
+              "isPrimaryKey": false,
+              "isOptional": true,
+              "isUnique": false,
+              "size": ""
+            },
+            {
+              "id": "49b647a9-2586-414f-8b01-786fdbe09752",
+              "name": "Hora",
+              "type": "Custom",
+              "position": 2,
+              "isPrimaryKey": false,
+              "isOptional": true,
+              "isUnique": false,
+              "size": "TIME"
+            },
+            {
+              "id": "ac45aa5a-3dd0-4d92-9ba8-97aca733da73",
+              "name": "Duracao",
+              "type": "NUMERIC(p s)",
+              "position": 3,
+              "isPrimaryKey": false,
+              "isOptional": true,
+              "isUnique": false,
+              "size": "10,2"
+            },
+            {
+              "id": "cf0845f3-8869-4edb-a00e-f38c6066d03a",
+              "name": "Modo",
+              "type": "VARCHAR(n)",
+              "position": 4,
+              "isPrimaryKey": false,
+              "isOptional": true,
+              "isUnique": false,
+              "size": "50"
+            },
+            {
+              "id": "fk_6bf21039-c32f-4a0b-b37f-21bb2296458f",
+              "name": "fk_Asteroide",
+              "type": "None",
+              "isForeignKey": true,
+              "foreignKeyProps": {
+                "foreignKeyGroupId": "a238463c-bfe9-4e00-beae-0d61edaefc9d",
+                "sourceTableId": "018c88fd-f9ef-4b31-a990-d164a869fd2b",
+                "columns": [
+                  {
+                    "id": "fk_28ed703f-732c-4444-bb31-b90ae77f013a",
+                    "name": "IDAsteroide",
+                    "type": "INT",
+                    "size": ""
+                  }
+                ]
+              },
+              "isOptional": false,
+              "position": 5
+            },
+            {
+              "id": "fk_5126e287-6500-4731-b813-038d68261b64",
+              "name": "fk_Astronomo",
+              "type": "None",
+              "isForeignKey": true,
+              "foreignKeyProps": {
+                "foreignKeyGroupId": "409c9ba4-9ed3-4ffd-9101-ab516d1bc67d",
+                "sourceTableId": "c3d19a92-7fb1-470d-8107-edf97b0ee945",
+                "columns": [
+                  {
+                    "id": "fk_6b01e800-e341-4b65-8462-44f9eb6cd70a",
+                    "name": "IDAstronomo",
+                    "type": "INT",
+                    "size": ""
+                  }
+                ]
+              },
+              "isOptional": true,
+              "position": 6
+            },
+            {
+              "id": "fk_949ec944-a556-4535-83e5-b8b1d5a37a10",
+              "name": "fk_Software",
+              "type": "None",
+              "isForeignKey": true,
+              "foreignKeyProps": {
+                "foreignKeyGroupId": "797631b5-b815-4baa-8a55-0576ac981b87",
+                "sourceTableId": "240e9093-7f82-434b-a88e-72c33118027f",
+                "columns": [
+                  {
+                    "id": "fk_9e464270-6548-4f8c-b594-fbb7c3838fa1",
+                    "name": "IDSoftware",
+                    "type": "INT",
+                    "size": ""
+                  }
+                ]
+              },
+              "isOptional": true,
+              "position": 7
+            },
+            {
+              "id": "fk_08e524f7-b6e1-4777-850f-ab6e414e8e04",
+              "name": "fk_Equipamento",
+              "type": "None",
+              "isForeignKey": true,
+              "foreignKeyProps": {
+                "foreignKeyGroupId": "68cd8b4d-ff5f-4906-a1eb-5b7195361b8d",
+                "sourceTableId": "c87f808b-985c-48c4-974e-b4ba518d5a78",
+                "columns": [
+                  {
+                    "id": "fk_f41b8376-6f59-41e5-9b94-e5ead76e38cb",
+                    "name": "IDEquipamento",
+                    "type": "INT",
+                    "size": ""
+                  }
+                ]
+              },
+              "isOptional": true,
+              "position": 8
+            }
+          ],
+          "isSelected": false
+        },
+        "measured": {
+          "width": 240,
+          "height": 252
+        },
+        "selected": false,
+        "dragging": false
+      },
+      {
+        "id": "00e10ceb-1900-4398-9003-8ab9d8ef03a6",
+        "type": "Table",
+        "position": {
+          "x": -343.40935784575584,
+          "y": 494.0451872540183
+        },
+        "data": {
+          "label": "Imagem",
+          "isConnectable": false,
+          "columns": [
+            {
+              "id": "54e17e57-1c3f-4c05-809c-302acae11796",
+              "name": "ID_Imagem",
+              "type": "INT",
+              "position": 0,
+              "isPrimaryKey": true,
+              "isOptional": false,
+              "isUnique": false,
+              "size": ""
+            },
+            {
+              "id": "5298c85f-e752-4fec-aa2a-0da6268ec71f",
+              "name": "URL",
+              "type": "VARCHAR(n)",
+              "position": 2,
+              "isPrimaryKey": false,
+              "isOptional": true,
+              "isUnique": false,
+              "size": "255"
+            },
+            {
+              "id": "f43a4561-3c7e-450c-922e-a14f0a126a7a",
+              "name": "Data_imagem",
+              "type": "DATE",
+              "position": 3,
+              "isPrimaryKey": false,
+              "isOptional": true,
+              "isUnique": false,
+              "size": ""
+            },
+            {
+              "id": "8bc489cc-7b73-4d46-83d0-80a8001de25f",
+              "name": "Descricao",
+              "type": "VARCHAR(n)",
+              "position": 4,
+              "isPrimaryKey": false,
+              "isOptional": true,
+              "isUnique": false,
+              "size": "255"
+            },
+            {
+              "id": "fk_30d0dee6-20ca-4c7b-82f3-5008d43579ee",
+              "name": "fk_Asteroide",
+              "type": "None",
+              "isForeignKey": true,
+              "foreignKeyProps": {
+                "foreignKeyGroupId": "32f2cc0e-375a-45f1-a334-0f3997d0c780",
+                "sourceTableId": "018c88fd-f9ef-4b31-a990-d164a869fd2b",
+                "columns": [
+                  {
+                    "id": "fk_28ed703f-732c-4444-bb31-b90ae77f013a",
+                    "name": "IDAsteroide",
+                    "type": "INT",
+                    "size": ""
+                  }
+                ]
+              }
+            }
+          ],
+          "isSelected": false
+        },
+        "measured": {
+          "width": 240,
+          "height": 152
+        },
+        "selected": false,
+        "dragging": false
+      },
+      {
+        "id": "652a40ac-c073-4738-9957-7b58e348d13f",
+        "type": "Table",
+        "position": {
+          "x": -344.73802306526505,
+          "y": 252.43970628588562
+        },
+        "data": {
+          "label": "Alerta",
+          "isConnectable": false,
+          "columns": [
+            {
+              "id": "db696573-57bd-44d7-8ac9-bb9dbf933b57",
+              "name": "ID_Alerta",
+              "type": "INT",
+              "position": 0,
+              "isPrimaryKey": true,
+              "isOptional": false,
+              "isUnique": false,
+              "size": ""
+            },
+            {
+              "id": "683c827f-69c0-4f3d-b76b-6cbb1ed2c9f9",
+              "name": "Data_Alerta",
+              "type": "DATE",
+              "position": 2,
+              "isPrimaryKey": false,
+              "isOptional": false,
+              "isUnique": false,
+              "size": ""
+            },
+            {
+              "id": "e4fb90d0-f543-4325-8144-4c87f4960477",
+              "name": "Prioridade",
+              "type": "VARCHAR(n)",
+              "position": 3,
+              "isPrimaryKey": false,
+              "isOptional": false,
+              "isUnique": false,
+              "size": "20"
+            },
+            {
+              "id": "248c4177-4599-48fd-8b8f-31cccfdfb3b2",
+              "name": "Nivel",
+              "type": "INT",
+              "position": 4,
+              "isPrimaryKey": false,
+              "isOptional": false,
+              "isUnique": false,
+              "size": ""
+            },
+            {
+              "id": "9fab8cae-cfd6-4ef9-bff6-203168d10998",
+              "name": "Descricao",
+              "type": "VARCHAR(n)",
+              "position": 5,
+              "isPrimaryKey": false,
+              "isOptional": false,
+              "isUnique": false,
+              "size": "255"
+            },
+            {
+              "id": "6d535b1c-3f8b-4b0f-8d7f-eae12287b96a",
+              "name": "Estado",
+              "type": "VARCHAR(n)",
+              "position": 6,
+              "isPrimaryKey": false,
+              "isOptional": false,
+              "isUnique": false,
+              "size": "20"
+            },
+            {
+              "id": "fk_9ec9c34a-c056-4de0-aedf-25e3f61673d2",
+              "name": "fk_Asteroide",
+              "type": "None",
+              "isForeignKey": true,
+              "foreignKeyProps": {
+                "foreignKeyGroupId": "2e0405b1-b709-450c-b430-d3c509b5bbeb",
+                "sourceTableId": "018c88fd-f9ef-4b31-a990-d164a869fd2b",
+                "columns": [
+                  {
+                    "id": "fk_28ed703f-732c-4444-bb31-b90ae77f013a",
+                    "name": "IDAsteroide",
+                    "type": "INT",
+                    "size": ""
+                  }
+                ]
+              }
+            }
+          ],
+          "isSelected": false
+        },
+        "measured": {
+          "width": 240,
+          "height": 202
+        },
+        "selected": false,
+        "dragging": false
+      }
+    ],
+    "edges": [
+      {
+        "id": "e98d06f7-81f1-4f36-8471-d259eac48d29->c3d19a92-7fb1-470d-8107-edf97b0ee945_766a74db-6c91-464b-88c3-0410dec51f3a",
+        "type": "Relational",
+        "source": "e98d06f7-81f1-4f36-8471-d259eac48d29",
+        "targetHandle": "foreign-key-handle-5290eb2b-71a9-4341-91da-bd023181e647",
+        "target": "c3d19a92-7fb1-470d-8107-edf97b0ee945",
+        "markerStart": {
+          "type": "arrow"
+        },
+        "data": {
+          "foreignKeyProps": {
+            "foreignKeyGroupId": "5290eb2b-71a9-4341-91da-bd023181e647",
+            "sourceTableId": "e98d06f7-81f1-4f36-8471-d259eac48d29",
+            "columns": [
+              {
+                "id": "fk_d3bb25c9-4ab2-432d-b65a-6116f95f2990",
+                "name": "IDCentro",
+                "type": "INT"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "e98d06f7-81f1-4f36-8471-d259eac48d29->c87f808b-985c-48c4-974e-b4ba518d5a78_e64fd0f5-05d4-4a91-9570-ae9bde928b05",
+        "type": "Relational",
+        "source": "e98d06f7-81f1-4f36-8471-d259eac48d29",
+        "targetHandle": "foreign-key-handle-4223c8a1-8a54-4a5d-993c-5cd239a0a70b",
+        "target": "c87f808b-985c-48c4-974e-b4ba518d5a78",
+        "markerStart": {
+          "type": "arrow"
+        },
+        "data": {
+          "foreignKeyProps": {
+            "foreignKeyGroupId": "4223c8a1-8a54-4a5d-993c-5cd239a0a70b",
+            "sourceTableId": "e98d06f7-81f1-4f36-8471-d259eac48d29",
+            "columns": [
+              {
+                "id": "fk_d3bb25c9-4ab2-432d-b65a-6116f95f2990",
+                "name": "IDCentro",
+                "type": "INT"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "018c88fd-f9ef-4b31-a990-d164a869fd2b->de1da1a8-0e1c-494b-997c-a305a1661aae_3e08c7d5-2335-4963-b643-8ea13b372d1f",
+        "type": "Relational",
+        "source": "018c88fd-f9ef-4b31-a990-d164a869fd2b",
+        "targetHandle": "foreign-key-handle-537e9ce7-3b38-4f74-87bf-a7fe115b9dc1",
+        "target": "de1da1a8-0e1c-494b-997c-a305a1661aae",
+        "markerStart": {
+          "type": "arrow"
+        },
+        "data": {
+          "foreignKeyProps": {
+            "foreignKeyGroupId": "537e9ce7-3b38-4f74-87bf-a7fe115b9dc1",
+            "sourceTableId": "018c88fd-f9ef-4b31-a990-d164a869fd2b",
+            "columns": [
+              {
+                "id": "fk_28ed703f-732c-4444-bb31-b90ae77f013a",
+                "name": "IDAsteroide",
+                "type": "INT"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "4af4f8a9-91de-4f1b-8ac3-b7dddfe5b6d2->de1da1a8-0e1c-494b-997c-a305a1661aae_679cf88e-d48c-4e34-8a5d-eedd92a60837",
+        "type": "Relational",
+        "source": "4af4f8a9-91de-4f1b-8ac3-b7dddfe5b6d2",
+        "targetHandle": "foreign-key-handle-556d0ee5-7444-4ebd-8c2d-66461986874c",
+        "target": "de1da1a8-0e1c-494b-997c-a305a1661aae",
+        "markerStart": {
+          "type": "arrow"
+        },
+        "data": {
+          "foreignKeyProps": {
+            "foreignKeyGroupId": "556d0ee5-7444-4ebd-8c2d-66461986874c",
+            "sourceTableId": "4af4f8a9-91de-4f1b-8ac3-b7dddfe5b6d2",
+            "columns": [
+              {
+                "id": "fk_41bd47e4-03b1-4b56-afb4-80fa3ce9729e",
+                "name": "IDClasse",
+                "type": "INT"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "018c88fd-f9ef-4b31-a990-d164a869fd2b->59da85e2-25b0-4675-95e8-e17c4959adef_b174e0e3-9a59-4c9b-8d9d-5ae0e4e2bf6b",
+        "type": "Relational",
+        "source": "018c88fd-f9ef-4b31-a990-d164a869fd2b",
+        "targetHandle": "foreign-key-handle-56604288-4a98-4a39-9821-a1de51a34706",
+        "target": "59da85e2-25b0-4675-95e8-e17c4959adef",
+        "markerStart": {
+          "type": "arrow"
+        },
+        "data": {
+          "foreignKeyProps": {
+            "foreignKeyGroupId": "56604288-4a98-4a39-9821-a1de51a34706",
+            "sourceTableId": "018c88fd-f9ef-4b31-a990-d164a869fd2b",
+            "columns": [
+              {
+                "id": "fk_28ed703f-732c-4444-bb31-b90ae77f013a",
+                "name": "IDAsteroide",
+                "type": "INT"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "c3d19a92-7fb1-470d-8107-edf97b0ee945->59da85e2-25b0-4675-95e8-e17c4959adef_bb818289-201b-4605-8921-77d2d00695c9",
+        "type": "Relational",
+        "source": "c3d19a92-7fb1-470d-8107-edf97b0ee945",
+        "targetHandle": "foreign-key-handle-538edb19-29d6-4fd2-8c21-2f610c06cb0d",
+        "target": "59da85e2-25b0-4675-95e8-e17c4959adef",
+        "markerStart": {
+          "type": "arrow"
+        },
+        "data": {
+          "foreignKeyProps": {
+            "foreignKeyGroupId": "538edb19-29d6-4fd2-8c21-2f610c06cb0d",
+            "sourceTableId": "c3d19a92-7fb1-470d-8107-edf97b0ee945",
+            "columns": [
+              {
+                "id": "fk_6b01e800-e341-4b65-8462-44f9eb6cd70a",
+                "name": "IDAstronomo",
+                "type": "INT"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "c87f808b-985c-48c4-974e-b4ba518d5a78->59da85e2-25b0-4675-95e8-e17c4959adef_3910a5ff-57c3-4c96-8702-1a2b79e15054",
+        "type": "Relational",
+        "source": "c87f808b-985c-48c4-974e-b4ba518d5a78",
+        "targetHandle": "foreign-key-handle-7cc1f796-355d-412d-a147-8cae518d479f",
+        "target": "59da85e2-25b0-4675-95e8-e17c4959adef",
+        "markerStart": {
+          "type": "arrow"
+        },
+        "data": {
+          "foreignKeyProps": {
+            "foreignKeyGroupId": "7cc1f796-355d-412d-a147-8cae518d479f",
+            "sourceTableId": "c87f808b-985c-48c4-974e-b4ba518d5a78",
+            "columns": [
+              {
+                "id": "fk_f41b8376-6f59-41e5-9b94-e5ead76e38cb",
+                "name": "IDEquipamento",
+                "type": "INT"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "240e9093-7f82-434b-a88e-72c33118027f->59da85e2-25b0-4675-95e8-e17c4959adef_ccce21f8-99fc-485a-b4d2-ef55657d6a77",
+        "type": "Relational",
+        "source": "240e9093-7f82-434b-a88e-72c33118027f",
+        "targetHandle": "foreign-key-handle-abea9163-f9e9-4a86-8a81-b5d39c9ecb54",
+        "target": "59da85e2-25b0-4675-95e8-e17c4959adef",
+        "markerStart": {
+          "type": "arrow"
+        },
+        "data": {
+          "foreignKeyProps": {
+            "foreignKeyGroupId": "abea9163-f9e9-4a86-8a81-b5d39c9ecb54",
+            "sourceTableId": "240e9093-7f82-434b-a88e-72c33118027f",
+            "columns": [
+              {
+                "id": "fk_9e464270-6548-4f8c-b594-fbb7c3838fa1",
+                "name": "IDSoftware",
+                "type": "INT"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "018c88fd-f9ef-4b31-a990-d164a869fd2b->00e10ceb-1900-4398-9003-8ab9d8ef03a6_8f83567a-ed25-472b-9dcd-9127f05887ea",
+        "type": "Relational",
+        "source": "018c88fd-f9ef-4b31-a990-d164a869fd2b",
+        "targetHandle": "foreign-key-handle-bb440126-977f-4e2b-a19e-1f83c3acd7e8",
+        "target": "00e10ceb-1900-4398-9003-8ab9d8ef03a6",
+        "markerStart": {
+          "type": "arrow"
+        },
+        "data": {
+          "foreignKeyProps": {
+            "foreignKeyGroupId": "bb440126-977f-4e2b-a19e-1f83c3acd7e8",
+            "sourceTableId": "018c88fd-f9ef-4b31-a990-d164a869fd2b",
+            "columns": [
+              {
+                "id": "fk_28ed703f-732c-4444-bb31-b90ae77f013a",
+                "name": "IDAsteroide",
+                "type": "INT"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "018c88fd-f9ef-4b31-a990-d164a869fd2b->652a40ac-c073-4738-9957-7b58e348d13f_a1c3e7d7-fee5-43dc-8e39-b1bd2b99012d",
+        "type": "Relational",
+        "source": "018c88fd-f9ef-4b31-a990-d164a869fd2b",
+        "targetHandle": "foreign-key-handle-0dcb029a-e35f-45f5-b9d3-e5a1835dc536",
+        "target": "652a40ac-c073-4738-9957-7b58e348d13f",
+        "markerStart": {
+          "type": "arrow"
+        },
+        "data": {
+          "foreignKeyProps": {
+            "foreignKeyGroupId": "0dcb029a-e35f-45f5-b9d3-e5a1835dc536",
+            "sourceTableId": "018c88fd-f9ef-4b31-a990-d164a869fd2b",
+            "columns": [
+              {
+                "id": "fk_28ed703f-732c-4444-bb31-b90ae77f013a",
+                "name": "IDAsteroide",
+                "type": "INT"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "018c88fd-f9ef-4b31-a990-d164a869fd2b->de1da1a8-0e1c-494b-997c-a305a1661aae_aa738f7a-e7f2-4436-bf9d-fff1f7b32976",
+        "type": "Relational",
+        "source": "018c88fd-f9ef-4b31-a990-d164a869fd2b",
+        "targetHandle": "foreign-key-handle-aa738f7a-e7f2-4436-bf9d-fff1f7b32976",
+        "target": "de1da1a8-0e1c-494b-997c-a305a1661aae",
+        "markerStart": {
+          "type": "arrow"
+        },
+        "data": {
+          "foreignKeyProps": {
+            "foreignKeyGroupId": "aa738f7a-e7f2-4436-bf9d-fff1f7b32976",
+            "sourceTableId": "018c88fd-f9ef-4b31-a990-d164a869fd2b",
+            "columns": [
+              {
+                "id": "fk_28ed703f-732c-4444-bb31-b90ae77f013a",
+                "name": "IDAsteroide",
+                "type": "INT",
+                "size": ""
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "4af4f8a9-91de-4f1b-8ac3-b7dddfe5b6d2->de1da1a8-0e1c-494b-997c-a305a1661aae_82968258-fbec-43c9-9df8-ee5986f5772d",
+        "type": "Relational",
+        "source": "4af4f8a9-91de-4f1b-8ac3-b7dddfe5b6d2",
+        "targetHandle": "foreign-key-handle-82968258-fbec-43c9-9df8-ee5986f5772d",
+        "target": "de1da1a8-0e1c-494b-997c-a305a1661aae",
+        "markerStart": {
+          "type": "arrow"
+        },
+        "data": {
+          "foreignKeyProps": {
+            "foreignKeyGroupId": "82968258-fbec-43c9-9df8-ee5986f5772d",
+            "sourceTableId": "4af4f8a9-91de-4f1b-8ac3-b7dddfe5b6d2",
+            "columns": [
+              {
+                "id": "fk_41bd47e4-03b1-4b56-afb4-80fa3ce9729e",
+                "name": "IDClasse",
+                "type": "INT",
+                "size": ""
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "018c88fd-f9ef-4b31-a990-d164a869fd2b->59da85e2-25b0-4675-95e8-e17c4959adef_a238463c-bfe9-4e00-beae-0d61edaefc9d",
+        "type": "Relational",
+        "source": "018c88fd-f9ef-4b31-a990-d164a869fd2b",
+        "targetHandle": "foreign-key-handle-a238463c-bfe9-4e00-beae-0d61edaefc9d",
+        "target": "59da85e2-25b0-4675-95e8-e17c4959adef",
+        "markerStart": {
+          "type": "arrow"
+        },
+        "data": {
+          "foreignKeyProps": {
+            "foreignKeyGroupId": "a238463c-bfe9-4e00-beae-0d61edaefc9d",
+            "sourceTableId": "018c88fd-f9ef-4b31-a990-d164a869fd2b",
+            "columns": [
+              {
+                "id": "fk_28ed703f-732c-4444-bb31-b90ae77f013a",
+                "name": "IDAsteroide",
+                "type": "INT",
+                "size": ""
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "c3d19a92-7fb1-470d-8107-edf97b0ee945->59da85e2-25b0-4675-95e8-e17c4959adef_409c9ba4-9ed3-4ffd-9101-ab516d1bc67d",
+        "type": "Relational",
+        "source": "c3d19a92-7fb1-470d-8107-edf97b0ee945",
+        "targetHandle": "foreign-key-handle-409c9ba4-9ed3-4ffd-9101-ab516d1bc67d",
+        "target": "59da85e2-25b0-4675-95e8-e17c4959adef",
+        "markerStart": {
+          "type": "arrow"
+        },
+        "data": {
+          "foreignKeyProps": {
+            "foreignKeyGroupId": "409c9ba4-9ed3-4ffd-9101-ab516d1bc67d",
+            "sourceTableId": "c3d19a92-7fb1-470d-8107-edf97b0ee945",
+            "columns": [
+              {
+                "id": "fk_6b01e800-e341-4b65-8462-44f9eb6cd70a",
+                "name": "IDAstronomo",
+                "type": "INT",
+                "size": ""
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "240e9093-7f82-434b-a88e-72c33118027f->59da85e2-25b0-4675-95e8-e17c4959adef_797631b5-b815-4baa-8a55-0576ac981b87",
+        "type": "Relational",
+        "source": "240e9093-7f82-434b-a88e-72c33118027f",
+        "targetHandle": "foreign-key-handle-797631b5-b815-4baa-8a55-0576ac981b87",
+        "target": "59da85e2-25b0-4675-95e8-e17c4959adef",
+        "markerStart": {
+          "type": "arrow"
+        },
+        "data": {
+          "foreignKeyProps": {
+            "foreignKeyGroupId": "797631b5-b815-4baa-8a55-0576ac981b87",
+            "sourceTableId": "240e9093-7f82-434b-a88e-72c33118027f",
+            "columns": [
+              {
+                "id": "fk_9e464270-6548-4f8c-b594-fbb7c3838fa1",
+                "name": "IDSoftware",
+                "type": "INT",
+                "size": ""
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "c87f808b-985c-48c4-974e-b4ba518d5a78->59da85e2-25b0-4675-95e8-e17c4959adef_68cd8b4d-ff5f-4906-a1eb-5b7195361b8d",
+        "type": "Relational",
+        "source": "c87f808b-985c-48c4-974e-b4ba518d5a78",
+        "targetHandle": "foreign-key-handle-68cd8b4d-ff5f-4906-a1eb-5b7195361b8d",
+        "target": "59da85e2-25b0-4675-95e8-e17c4959adef",
+        "markerStart": {
+          "type": "arrow"
+        },
+        "data": {
+          "foreignKeyProps": {
+            "foreignKeyGroupId": "68cd8b4d-ff5f-4906-a1eb-5b7195361b8d",
+            "sourceTableId": "c87f808b-985c-48c4-974e-b4ba518d5a78",
+            "columns": [
+              {
+                "id": "fk_f41b8376-6f59-41e5-9b94-e5ead76e38cb",
+                "name": "IDEquipamento",
+                "type": "INT",
+                "size": ""
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "e98d06f7-81f1-4f36-8471-d259eac48d29->c3d19a92-7fb1-470d-8107-edf97b0ee945_11515335-84f2-4d23-96d8-03b538e0c815",
+        "type": "Relational",
+        "source": "e98d06f7-81f1-4f36-8471-d259eac48d29",
+        "targetHandle": "foreign-key-handle-11515335-84f2-4d23-96d8-03b538e0c815",
+        "target": "c3d19a92-7fb1-470d-8107-edf97b0ee945",
+        "markerStart": {
+          "type": "arrow"
+        },
+        "data": {
+          "foreignKeyProps": {
+            "foreignKeyGroupId": "11515335-84f2-4d23-96d8-03b538e0c815",
+            "sourceTableId": "e98d06f7-81f1-4f36-8471-d259eac48d29",
+            "columns": [
+              {
+                "id": "fk_d3bb25c9-4ab2-432d-b65a-6116f95f2990",
+                "name": "IDCentro",
+                "type": "INT",
+                "size": ""
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "e98d06f7-81f1-4f36-8471-d259eac48d29->c87f808b-985c-48c4-974e-b4ba518d5a78_19121890-debc-4095-b196-92e20065cf7c",
+        "type": "Relational",
+        "source": "e98d06f7-81f1-4f36-8471-d259eac48d29",
+        "targetHandle": "foreign-key-handle-19121890-debc-4095-b196-92e20065cf7c",
+        "target": "c87f808b-985c-48c4-974e-b4ba518d5a78",
+        "markerStart": {
+          "type": "arrow"
+        },
+        "data": {
+          "foreignKeyProps": {
+            "foreignKeyGroupId": "19121890-debc-4095-b196-92e20065cf7c",
+            "sourceTableId": "e98d06f7-81f1-4f36-8471-d259eac48d29",
+            "columns": [
+              {
+                "id": "fk_d3bb25c9-4ab2-432d-b65a-6116f95f2990",
+                "name": "IDCentro",
+                "type": "INT",
+                "size": ""
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "018c88fd-f9ef-4b31-a990-d164a869fd2b->00e10ceb-1900-4398-9003-8ab9d8ef03a6_32f2cc0e-375a-45f1-a334-0f3997d0c780",
+        "type": "Relational",
+        "source": "018c88fd-f9ef-4b31-a990-d164a869fd2b",
+        "targetHandle": "foreign-key-handle-32f2cc0e-375a-45f1-a334-0f3997d0c780",
+        "target": "00e10ceb-1900-4398-9003-8ab9d8ef03a6",
+        "markerStart": {
+          "type": "arrow"
+        },
+        "data": {
+          "foreignKeyProps": {
+            "foreignKeyGroupId": "32f2cc0e-375a-45f1-a334-0f3997d0c780",
+            "sourceTableId": "018c88fd-f9ef-4b31-a990-d164a869fd2b",
+            "columns": [
+              {
+                "id": "fk_28ed703f-732c-4444-bb31-b90ae77f013a",
+                "name": "IDAsteroide",
+                "type": "INT",
+                "size": ""
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "018c88fd-f9ef-4b31-a990-d164a869fd2b->652a40ac-c073-4738-9957-7b58e348d13f_2e0405b1-b709-450c-b430-d3c509b5bbeb",
+        "type": "Relational",
+        "source": "018c88fd-f9ef-4b31-a990-d164a869fd2b",
+        "targetHandle": "foreign-key-handle-2e0405b1-b709-450c-b430-d3c509b5bbeb",
+        "target": "652a40ac-c073-4738-9957-7b58e348d13f",
+        "markerStart": {
+          "type": "arrow"
+        },
+        "data": {
+          "foreignKeyProps": {
+            "foreignKeyGroupId": "2e0405b1-b709-450c-b430-d3c509b5bbeb",
+            "sourceTableId": "018c88fd-f9ef-4b31-a990-d164a869fd2b",
+            "columns": [
+              {
+                "id": "fk_28ed703f-732c-4444-bb31-b90ae77f013a",
+                "name": "IDAsteroide",
+                "type": "INT",
+                "size": ""
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "viewport": {
+      "x": 1099.0424664063312,
+      "y": 210.01365994565282,
+      "zoom": 0.6688921358466885
+    }
+  },
+  "name": "TP_BD_MODELO_LOGICO",
+  "folder": {
+    "name": "Diagrams",
+    "folderType": 1,
+    "depth": 0,
+    "id": 135138
+  },
+  "id": 209680,
+  "updatedAtTimestamp": 1767403918
+}
