@@ -10,9 +10,9 @@
           "y": 421
         },
         "data": {
-          "label": "Asteróide",
+          "label": "Asteroide",
           "type": "Regular",
-          "isConnectable": true,
+          "isConnectable": false,
           "isSelected": false
         },
         "measured": {
@@ -30,9 +30,9 @@
           "y": 426
         },
         "data": {
-          "label": "Órbita",
+          "label": "Orbita",
           "type": "Regular",
-          "isConnectable": true,
+          "isConnectable": false,
           "isSelected": false
         },
         "measured": {
@@ -62,7 +62,7 @@
             "maxCardinality": "Many"
           },
           "isSelected": false,
-          "isConnectable": false
+          "isConnectable": true
         },
         "measured": {
           "width": 100,
@@ -79,9 +79,9 @@
           "y": 765.0546134388833
         },
         "data": {
-          "label": "Centro de Observação",
+          "label": "Centro de Observacao",
           "type": "Regular",
-          "isConnectable": true,
+          "isConnectable": false,
           "isSelected": false
         },
         "measured": {
@@ -99,9 +99,9 @@
           "y": 585.0841235250822
         },
         "data": {
-          "label": "Observação",
+          "label": "Observacao",
           "type": "Regular",
-          "isConnectable": true,
+          "isConnectable": false,
           "isSelected": false
         },
         "measured": {
@@ -119,9 +119,9 @@
           "y": 589.76394894892
         },
         "data": {
-          "label": "Astrónomo",
+          "label": "Astronomo",
           "type": "Regular",
-          "isConnectable": true,
+          "isConnectable": false,
           "isSelected": false
         },
         "measured": {
@@ -141,7 +141,7 @@
         "data": {
           "label": "Equipamento",
           "type": "Regular",
-          "isConnectable": true,
+          "isConnectable": false,
           "isSelected": false
         },
         "measured": {
@@ -161,7 +161,7 @@
         "data": {
           "label": "Software",
           "type": "Regular",
-          "isConnectable": true,
+          "isConnectable": false,
           "isSelected": false
         },
         "measured": {
@@ -181,7 +181,7 @@
         "data": {
           "label": "Classe",
           "type": "Regular",
-          "isConnectable": true,
+          "isConnectable": false,
           "isSelected": false
         },
         "measured": {
@@ -211,7 +211,7 @@
             "maxCardinality": "Many"
           },
           "isSelected": false,
-          "isConnectable": false
+          "isConnectable": true
         },
         "measured": {
           "width": 100,
@@ -240,7 +240,7 @@
             "maxCardinality": "One"
           },
           "isSelected": false,
-          "isConnectable": false
+          "isConnectable": true
         },
         "measured": {
           "width": 100,
@@ -269,7 +269,7 @@
             "maxCardinality": "One"
           },
           "isSelected": false,
-          "isConnectable": false
+          "isConnectable": true
         },
         "measured": {
           "width": 100,
@@ -298,7 +298,7 @@
             "maxCardinality": "One"
           },
           "isSelected": false,
-          "isConnectable": false
+          "isConnectable": true
         },
         "measured": {
           "width": 100,
@@ -327,7 +327,7 @@
             "maxCardinality": "Many"
           },
           "isSelected": false,
-          "isConnectable": false
+          "isConnectable": true
         },
         "measured": {
           "width": 100,
@@ -356,7 +356,7 @@
             "maxCardinality": "Many"
           },
           "isSelected": false,
-          "isConnectable": false
+          "isConnectable": true
         },
         "measured": {
           "width": 100,
@@ -375,7 +375,7 @@
         "data": {
           "label": "Imagem",
           "type": "Regular",
-          "isConnectable": true,
+          "isConnectable": false,
           "isSelected": false
         },
         "measured": {
@@ -395,7 +395,7 @@
         "data": {
           "label": "Alerta",
           "type": "Regular",
-          "isConnectable": true,
+          "isConnectable": false,
           "isSelected": false
         },
         "measured": {
@@ -425,7 +425,7 @@
             "minCardinality": "Optional"
           },
           "isSelected": false,
-          "isConnectable": false
+          "isConnectable": true
         },
         "measured": {
           "width": 100,
@@ -453,7 +453,7 @@
             "minCardinality": "Optional"
           },
           "isSelected": false,
-          "isConnectable": false
+          "isConnectable": true
         },
         "measured": {
           "width": 100,
@@ -481,12 +481,14 @@
             "minCardinality": "Optional",
             "maxCardinality": "Many"
           },
-          "isSelected": false
+          "isSelected": false,
+          "isConnectable": true
         },
         "measured": {
           "width": 100,
           "height": 50
-        }
+        },
+        "selected": false
       }
     ],
     "edges": [
@@ -734,9 +736,9 @@
       }
     ],
     "viewport": {
-      "x": 275.76374891846626,
-      "y": -150.32392705437212,
-      "zoom": 1
+      "x": 321.40219696475503,
+      "y": -62.23375083716792,
+      "zoom": 0.8705505632961241
     }
   },
   "name": "TP_BD_MODELO_CONCEPTUAL",
@@ -747,5 +749,5 @@
     "id": 135138
   },
   "id": 209682,
-  "updatedAtTimestamp": 1767404278
+  "updatedAtTimestamp": 1767473714
 }
